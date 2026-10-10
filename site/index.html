@@ -34,7 +34,12 @@
 <div class="card">
 <h2>3. Entre no jogo</h2>
 <p>Abra o <code>main.exe</code>, clique no servidor <b>Mu Reborn</b> e entre com o login e senha que o administrador te passou.</p>
-<p>Ainda sem conta? Peça ao administrador — contas são criadas manualmente no piloto.</p>
+<p>Ainda sem conta? Preencha abaixo — o administrador cria e te avisa.</p>
+<form name="pedido-conta" method="POST" data-netlify="true">
+<p><label>Login desejado (4–10 letras/números):<br><input type="text" name="login" required minlength="4" maxlength="10" pattern="[A-Za-z0-9]+" style="padding:8px;width:90%"></label></p>
+<p><label>Seu nome/apelido para contato:<br><input type="text" name="contato" required maxlength="40" style="padding:8px;width:90%"></label></p>
+<p><button type="submit" style="background:#7a5c00;color:#fff;padding:10px 20px;border:none;border-radius:6px;font-weight:bold">Pedir conta</button></p>
+</form>
 </div>
 
 <div class="card">
