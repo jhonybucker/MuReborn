@@ -1,0 +1,3 @@
+//ServerCode   ServerName         ServerAddress      ServerPort       ServerType
+0              "GameServer"       "TUIP"        55901            "SHOW"
+end

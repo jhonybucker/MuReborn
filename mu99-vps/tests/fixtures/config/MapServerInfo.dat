@@ -1,0 +1,8 @@
+0
+//ServerCode   MapServerGroup   InitSetVal   IpAddress          Port
+0	       0	        1	     STUIP	55901
+end
+
+1
+//ServerCode   NotMoveOption   NextMap   NextServerCode
+end
