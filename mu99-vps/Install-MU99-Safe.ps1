@@ -539,12 +539,20 @@ function Test-Mu99ListingLinkHint {
   <#
   .SYNOPSIS
     Identifica indicadores explicitos de link em uma linha/bloco de listagem
-    de extrator (Symbolic Link, Hard Link, Type=Link, setas, marcadores,
-    modos unix lrwx). Qualquer acerto bloqueia a extracao antes de gravar.
+    de extrator (Symbolic/Hard/Copy Link com destino, Type=Link, setas,
+    marcadores, modos unix lrwx). Qualquer acerto bloqueia a extracao antes
+    de gravar. Campos de link VAZIOS do `7z -slt` (ex.: "Symbolic Link = " sem
+    destino, impresso para todo membro RAR5) NAO indicam link e sao ignorados.
   #>
   [CmdletBinding()]
   param([Parameter(Mandatory = $true)][string]$Text)
-  return [bool]($Text -match '(?i)(symbolic[ -]?link|hard[ -]?link|type\s*[:=]\s*link|->|<symlink>|<junction>|\bsymlink\b|\bjunction\b|lrwx)')
+  # Unica excecao: linhas de campo VAZIO do `7z -slt` (ex.: "Symbolic Link = "
+  # sem destino, impresso para todo membro RAR5). Todo o resto mantem a
+  # postura fail-closed original: qualquer mencao bloqueia.
+  $lines = @($Text -split "`r?`n")
+  $kept = @($lines | Where-Object { $_ -notmatch '(?i)^\s*(Symbolic Link|Hard Link|Copy Link)\s*=\s*$' })
+  if ($kept.Count -eq 0) { return $false }
+  return [bool](($kept -join "`n") -match '(?i)(symbolic[ -]?link|hard[ -]?link|copy[ -]?link|type\s*[:=]\s*link|->|<symlink>|<junction>|\bsymlink\b|\bjunction\b|lrwx)')
 }
 
 function Get-Mu99NestedRarInventory {
@@ -591,8 +599,19 @@ function Get-Mu99NestedRarInventory {
   $tool = $resolvedTool.ToLowerInvariant()
   $outLines = @()
   if ($tool -like '*7z*.exe') {
-    $outLines = & $resolvedTool 'l' '-slt' '--' $RarPath 2>&1
-    if ($LASTEXITCODE -ne 0) { throw ("Falha ao listar RAR (7-Zip): " + ($outLines -join "`n")) }
+    # EAP Stop + 2>&1 transformaria qualquer stderr do extrator em
+    # RemoteException de mensagem vazia; isola com Continue e relata honesto.
+    $prevEap = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try {
+      $outLines = & $resolvedTool 'l' '-slt' '--' $RarPath 2>&1
+    } finally {
+      $ErrorActionPreference = $prevEap
+    }
+    if ($LASTEXITCODE -ne 0) {
+      $flat = @($outLines | ForEach-Object { [string]$_ }) -join "`n"
+      throw ("Falha ao listar RAR (7-Zip, exit " + $LASTEXITCODE + "): " + $flat)
+    }
     $names = @()
     $pendingName = ''; $pendingSize = [long]0; $pendingBlock = ''
     foreach ($line in ($outLines + @(''))) {
@@ -615,8 +634,17 @@ function Get-Mu99NestedRarInventory {
     if ($names.Count -eq 0) { throw ("Listagem vazia ou ilegivel para: " + $RarPath) }
     return $names
   } else {
-    $outLines = & $resolvedTool 'l' '-c-' '--' $RarPath 2>&1
-    if ($LASTEXITCODE -ne 0) { throw ("Falha ao listar RAR (WinRAR/UnRAR): " + ($outLines -join "`n")) }
+    $prevEap = $ErrorActionPreference
+    $ErrorActionPreference = 'Continue'
+    try {
+      $outLines = & $resolvedTool 'l' '-c-' '--' $RarPath 2>&1
+    } finally {
+      $ErrorActionPreference = $prevEap
+    }
+    if ($LASTEXITCODE -ne 0) {
+      $flat = @($outLines | ForEach-Object { [string]$_ }) -join "`n"
+      throw ("Falha ao listar RAR (WinRAR/UnRAR, exit " + $LASTEXITCODE + "): " + $flat)
+    }
     # UnRAR lista colunas; extrai tamanho e nome apos data/hora.
     $names = @()
     $inList = $false
@@ -801,23 +829,35 @@ function Expand-Mu99NestedArchive {
     if ($leaf -match '[. ]$') { throw ("Nome terminado em ponto/espaco (formato nao suportado); expansao bloqueada: " + $m.name) }
   }
   # 3. Remover raiz comum unica (ex.: "[release] Files 99b\") quando presente em todos.
+  #    A propria entrada de diretorio da raiz (nome sem separador, igual a raiz
+  #    candidata) nao invalida a raiz comum; qualquer outra entrada sem
+  #    separador, ou prefixo divergente, mantem o layout original.
   $strippedRoot = ''
   $finalNames = @()
   foreach ($m in $members) { $finalNames += [string]$m.name }
-  $split = @()
-  foreach ($n in $finalNames) { $split += ,(@(([string]$n).Replace('/', '\') -split '\\')) }
+  $candidate = ''
   $common = $true
-  $first = ''
-  foreach ($parts in $split) {
-    if ($parts.Count -lt 2) { $common = $false; break }
-    if ($first -eq '') { $first = $parts[0] }
-    elseif ($parts[0] -ne $first) { $common = $false; break }
+  foreach ($n in $finalNames) {
+    $p = @(([string]$n).Replace('/', '\') -split '\\')
+    if ($p.Count -lt 2) { continue }
+    if ($candidate -eq '') { $candidate = $p[0] }
+    elseif ($p[0] -ne $candidate) { $common = $false; break }
   }
-  if ($common -and ($first -ne '') -and ($first -ne '.') -and ($first -ne '..')) {
-    $strippedRoot = $first
+  if ($common -and ($candidate -ne '')) {
+    foreach ($n in $finalNames) {
+      $p = @(([string]$n).Replace('/', '\') -split '\\')
+      if (($p.Count -lt 2) -and ($n -ne $candidate)) { $common = $false; break }
+    }
+  }
+  if ($common -and ($candidate -ne '') -and ($candidate -ne '.') -and ($candidate -ne '..')) {
+    $strippedRoot = $candidate
     $finalNames = @()
     foreach ($m in $members) {
       $rel = ([string]$m.name).Replace('/', '\')
+      if ($rel -ieq $strippedRoot) { continue }
+      if (-not $rel.StartsWith(($strippedRoot + '\'), [System.StringComparison]::OrdinalIgnoreCase)) {
+        throw ("Membro fora da raiz comum apos validacao; expansao bloqueada: " + $m.name)
+      }
       $rel = $rel.Substring($strippedRoot.Length + 1)
       if ([string]::IsNullOrWhiteSpace($rel)) { throw ("Membro reduzido a raiz comum; expansao bloqueada: " + $m.name) }
       if (-not (Test-Mu99ArchiveEntryPath -Root $DestinationDir -EntryName $rel)) {
@@ -1206,8 +1246,14 @@ function Get-Mu99FileLinkCount {
   if (-not $runner) {
     $runner = {
       param([string]$P)
-      $o = & fsutil hardlink list "$P" 2>&1
-      if ($LASTEXITCODE -ne 0) { throw ("fsutil hardlink list falhou: " + (@($o) -join "`n")) }
+      $prevEap = $ErrorActionPreference
+      $ErrorActionPreference = 'Continue'
+      try {
+        $o = & fsutil hardlink list "$P" 2>&1
+      } finally {
+        $ErrorActionPreference = $prevEap
+      }
+      if ($LASTEXITCODE -ne 0) { throw ("fsutil hardlink list falhou (exit " + $LASTEXITCODE + "): " + (@($o | ForEach-Object { [string]$_ }) -join "`n")) }
       return @($o)
     }.GetNewClosure()
   }
@@ -1295,9 +1341,11 @@ function Set-Mu99AddressConfiguration {
       $f = Read-Mu99FileBytes -Path $src
       $newText = $f.text
       if ($ch.key -eq '"TUIP"') { $newText = $newText.Replace('"TUIP"', ('"' + $Proposal.serverAddress + '"')) }
-      elseif ($ch.key -eq 'STUIP') { $newText = [regex]::Replace($newText, '(?m)(^|\s)STUIP(\s|$)', ('$1' + $Proposal.serverAddress + '$2'), 1) }
+      # NOTA: usar ${1}/${2} (nao $1/$2): endereco iniciado em digito colaria no
+      # numero do grupo e vazaria "$1" literal no arquivo (ex.: "$1102.165.46.30").
+      elseif ($ch.key -eq 'STUIP') { $newText = [regex]::Replace($newText, '(?m)(^|\s)STUIP(\s|$)', ('${1}' + $Proposal.serverAddress + '${2}'), 1) }
       elseif ($ch.key -eq 'TUIP') {
-        if ($src -like '*MapServerInfo.dat') { $newText = [regex]::Replace($newText, '(?m)(^|\s)TUIP(\s|$)', ('$1' + $Proposal.serverAddress + '$2'), 1) }
+        if ($src -like '*MapServerInfo.dat') { $newText = [regex]::Replace($newText, '(?m)(^|\s)TUIP(\s|$)', ('${1}' + $Proposal.serverAddress + '${2}'), 1) }
         else { $newText = $newText.Replace('"TUIP"', ('"' + $Proposal.serverAddress + '"')) }
       }
       elseif ($ch.key -eq 'IpAddress') { $newText = [regex]::Replace($newText, '(?im)^\s*IpAddress\s*=\s*TUIP\s*$', ('IpAddress = ' + $Proposal.serverAddress), 1) }
@@ -1380,7 +1428,7 @@ function Test-Mu99SqlInstance {
   $exec = $SqlExecutor
   if (-not $exec) { $exec = Get-Mu99SqlExecutor }
   try {
-    $rows = & $exec $SqlInstance 'SELECT SERVERPROPERTY(''ProductVersion'') AS ProductVersion, SERVERPROPERTY(''Edition'') AS Edition, DB_NAME() AS CurrentDb' $Credential
+    $rows = @(& $exec $SqlInstance 'SELECT SERVERPROPERTY(''ProductVersion'') AS ProductVersion, SERVERPROPERTY(''Edition'') AS Edition, DB_NAME() AS CurrentDb' $Credential)
     $v = ''; $e = ''
     if ($rows -and $rows.Count -gt 0) { $v = '' + $rows[0].ProductVersion; $e = '' + $rows[0].Edition }
     return [pscustomobject]@{ instance = $SqlInstance; reachable = $true; productVersion = $v; edition = $e }
@@ -1490,10 +1538,34 @@ function Invoke-Mu99DatabaseRestore {
       throw ("Espaco insuficiente para restauracao em " + $driveRoot)
     }
   } catch { if ($_.Exception.Message -match 'Espaco insuficiente') { throw } }
-  if ($PSCmdlet.ShouldProcess($DatabaseName, ("Restaurar DB\MuOnline.bak sobre " + $DatabaseName + ' (instancia ' + $SqlInstance + ')'))) {
-    $bq = $BackupPath.Replace("'", "''")
-    & $exec $SqlInstance ("RESTORE DATABASE " + $dbId + " FROM DISK = N'" + $bq + "' WITH REPLACE, RECOVERY") $Credential | Out-Null
-  } else { return $null }
+  # Realoca arquivos do backup (WITH MOVE): o .bak referencia as pastas da
+  # instancia original (ex.: MSSQL11...), que nao existem aqui. Destino = pasta
+  # DATA da instancia local. Tudo ate aqui e somente leitura.
+  $dataRows = @(& $exec $SqlInstance "SELECT SERVERPROPERTY('InstanceDefaultDataPath') AS DataPath" $Credential)
+  $dataDir = ''
+  if ($dataRows.Count -gt 0) { $dataDir = '' + $dataRows[0].DataPath }
+  if ([string]::IsNullOrWhiteSpace($dataDir)) {
+    $masterRows = @(& $exec $SqlInstance "SELECT SUBSTRING(mf.physical_name, 1, CHARINDEX(N'master.mdf', LOWER(mf.physical_name)) - 1) AS DataPath FROM sys.master_files mf WHERE mf.database_id = 1 AND mf.[file_id] = 1" $Credential)
+    if ($masterRows.Count -gt 0) { $dataDir = '' + $masterRows[0].DataPath }
+  }
+  if ([string]::IsNullOrWhiteSpace($dataDir)) { throw ("Nao foi possivel determinar a pasta DATA da instancia; restauracao abortada (sem adivinhar caminhos).") }
+  $moves = @()
+  foreach ($fl in @($meta.fileList)) {
+    $logical = '' + $fl.LogicalName
+    $phys = '' + $fl.PhysicalName
+    if ([string]::IsNullOrWhiteSpace($logical)) { throw ("FILELISTONLY sem LogicalName; restauracao abortada.") }
+    $leaf = $logical
+    try {
+      $lb = [System.IO.Path]::GetFileName($phys)
+      if (-not [string]::IsNullOrWhiteSpace($lb)) { $leaf = $lb }
+    } catch {}
+    $moves += ("MOVE N'" + $logical.Replace("'", "''") + "' TO N'" + ((Join-Path $dataDir $leaf)).Replace("'", "''") + "'")
+  }
+  if ($moves.Count -eq 0) { throw ("FILELISTONLY vazio; restauracao abortada.") }
+  $moveClause = ($moves -join ', ')
+  if (-not $PSCmdlet.ShouldProcess($DatabaseName, ("Restaurar DB\MuOnline.bak sobre " + $DatabaseName + ' (instancia ' + $SqlInstance + ')'))) { return $null }
+  $bq = $BackupPath.Replace("'", "''")
+  & $exec $SqlInstance ("RESTORE DATABASE " + $dbId + " FROM DISK = N'" + $bq + "' WITH REPLACE, RECOVERY, " + $moveClause) $Credential | Out-Null
   return [pscustomobject]@{
     database = $DatabaseName
     instance = $SqlInstance
@@ -1945,7 +2017,8 @@ switch ($Mode) {
     }
     $backupRoot = Join-Path $DestinationRoot 'backups'
     $res = Invoke-Mu99DatabaseRestore -BackupPath $bak -SqlInstance $SqlInstance -DatabaseName $DatabaseName -BackupRoot $backupRoot -ConfirmDatabaseOverwrite:$ConfirmDatabaseOverwrite -Credential $cred
-    Write-Output ("Banco restaurado: " + $res.database + " @ " + $res.instance)
+    if ($null -eq $res) { Write-Output 'Banco: simulacao WhatIf concluida (nada foi restaurado).' }
+    else { Write-Output ("Banco restaurado: " + $res.database + " @ " + $res.instance) }
   }
   'PrepararCliente' {
     $clientDir = Join-Path $DestinationRoot 'client'

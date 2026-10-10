@@ -508,6 +508,26 @@ try {
   $tmp = New-Mu99TempDir
   try {
     $srv = Join-Path $tmp 'server'
+    $cli = Join-Path $tmp 'client'
+    $out = Join-Path $tmp 'out'
+    New-Item -ItemType Directory -Path $srv | Out-Null
+    New-Item -ItemType Directory -Path $out | Out-Null
+    Copy-Mu99ConfigFixtures -ServerRoot $srv -ClientRoot $cli
+    $msPath = Join-Path $srv 'Data\MapServerInfo.dat'
+    # Regressao: endereco iniciado em digito nao pode vazar "$1" literal no arquivo.
+    $propD = Get-Mu99ConfigProposal -ServerRoot $srv -ClientRoot $cli -ServerAddress '102.165.46.30'
+    Set-Mu99AddressConfiguration -Proposal $propD -DestinationRoot $out | Out-Null
+    $newMsD = [System.IO.File]::ReadAllText($msPath)
+    Assert-Mu99True -Condition ((-not ($newMsD.Contains('$'))) -and ($newMsD -match '(?m)(^|\s)102\.165\.46\.30(\s|$)')) -Name 'Task4: STUIP com endereco iniciado em digito nao vaza $1'
+  } finally { Remove-Mu99TempDir -Dir $tmp }
+} catch {
+  Write-Mu99TestResult -Name 'Task4: regressao $1 em endereco com digito inicial' -Passed $false -Detail $_.Exception.Message
+}
+
+try {
+  $tmp = New-Mu99TempDir
+  try {
+    $srv = Join-Path $tmp 'server'
     New-Item -ItemType Directory -Path $srv | Out-Null
     [System.IO.File]::WriteAllText((Join-Path $srv 'GameServer.exe'), 'binario-falso-nao-executar')
     [System.IO.File]::WriteAllText((Join-Path $srv 'vcredist_x86.exe'), 'instalador-falso-nao-executar')
@@ -562,6 +582,7 @@ function New-Mu99FakeSqlExecutor {
     }
     if ($Query -match 'BACKUP DATABASE') { return @() }
     if ($Query -match 'RESTORE DATABASE') { return @() }
+    if ($Query -match 'InstanceDefaultDataPath') { return @([pscustomobject]@{ DataPath = 'C:\SQLData\' }) }
     if ($Query -match 'SERVERPROPERTY') { return @([pscustomobject]@{ ProductVersion = '15.0.0'; Edition = 'Express Edition'; CurrentDb = 'master' }) }
     return @()
   }.GetNewClosure()
@@ -597,6 +618,8 @@ try {
     Assert-Mu99True -Condition (($iVerify -ge 0) -and ($iRestore -gt $iVerify)) -Name 'Task5: VERIFYONLY precede o restore'
     Assert-Mu99True -Condition ($q2 -match '\[MuOnline\]') -Name 'Task5: identificador de banco citado com seguranca'
     Assert-Mu99True -Condition ($res.database -eq 'MuOnline') -Name 'Task5: restore de banco novo retorna resumo'
+    Assert-Mu99True -Condition ($q2 -match 'WITH REPLACE, RECOVERY, MOVE') -Name 'Task5: restore realoca arquivos com WITH MOVE'
+    Assert-Mu99True -Condition ($q2 -match "MOVE N'MuOnline'") -Name 'Task5: MOVE usa nome logico do FILELISTONLY'
     # Banco existente sem switch: recusa
     $fake3 = New-Mu99FakeSqlExecutor -ExistingDatabases @('MuOnline')
     $refused = $false
