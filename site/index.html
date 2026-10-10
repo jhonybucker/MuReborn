@@ -34,12 +34,28 @@
 <div class="card">
 <h2>3. Entre no jogo</h2>
 <p>Abra o <code>main.exe</code>, clique no servidor <b>Mu Reborn</b> e entre com o login e senha que o administrador te passou.</p>
-<p>Ainda sem conta? Preencha abaixo — o administrador cria e te avisa.</p>
-<form name="pedido-conta" method="POST" data-netlify="true">
-<p><label>Login desejado (4–10 letras/números):<br><input type="text" name="login" required minlength="4" maxlength="10" pattern="[A-Za-z0-9]+" style="padding:8px;width:90%"></label></p>
-<p><label>Seu nome/apelido para contato:<br><input type="text" name="contato" required maxlength="40" style="padding:8px;width:90%"></label></p>
-<p><button type="submit" style="background:#7a5c00;color:#fff;padding:10px 20px;border:none;border-radius:6px;font-weight:bold">Pedir conta</button></p>
+<p>Ainda sem conta? Crie na hora (login 4–10 letras/números, senha 4–20 sem espaços):</p>
+<form id="f-signup">
+<p><input id="s-login" type="text" required minlength="4" maxlength="10" pattern="[A-Za-z0-9]+" placeholder="Login" style="padding:8px;width:90%"></p>
+<p><input id="s-pass" type="password" required minlength="4" maxlength="20" placeholder="Senha" style="padding:8px;width:90%"></p>
+<p><button type="submit" style="background:#7a5c00;color:#fff;padding:10px 20px;border:none;border-radius:6px;font-weight:bold">Criar conta</button></p>
+<p id="s-msg"></p>
 </form>
+<script>
+document.getElementById('f-signup').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const m = document.getElementById('s-msg');
+  m.textContent = 'Criando...';
+  try {
+    const r = await fetch('https://mu-reborn.duckdns.org/api/signup', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ login: document.getElementById('s-login').value, password: document.getElementById('s-pass').value })
+    });
+    const j = await r.json();
+    m.textContent = (j.ok ? 'Conta criada! Entre no jogo com ela.' : ('Falha: ' + (j.error || r.status)));
+  } catch (err) { m.textContent = 'Falha de rede, tente de novo.'; }
+});
+</script>
 </div>
 
 <div class="card">
