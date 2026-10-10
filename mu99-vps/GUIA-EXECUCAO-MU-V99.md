@@ -25,6 +25,16 @@ secao 9 (login externo, personagem, persistencia, reinicio, backup testado e
 piloto com 2–5 jogadores). Resultado do harness local **nao** substitui esses
 testes.
 
+### Pacote de servidor no repositorio privado
+
+O arquivo `packages/mu99-server-pilot.zip` contem somente os RARs necessarios
+para o servidor (`[MUDevs - Free Release 2] Files 99b.rar` e
+`Librerias.rar`). Seu SHA-256 e
+`75F82098EBFCD8FF9702B937B2A29AAC550D0340605E4C03782303BF50330CB7`.
+Ele permite preparar a VPS logo apos o clone, sem transferir o pacote inteiro.
+O RAR do cliente nao faz parte do repositorio; distribua-o separadamente
+somente para pessoas autorizadas.
+
 ## 2. Decisoes que so o operador pode tomar (bloqueios)
 
 | # | Decisao | Onde registrar |
@@ -64,7 +74,7 @@ confirmacao e respeitam `-WhatIf` (simula sem alterar nada).
 
 ```powershell
 .\mu99-vps\Install-MU99-Safe.ps1 -Mode Diagnostico `
-  -PackageZipPath C:\pacotes\pacote-99b.zip `
+  -PackageZipPath .\packages\mu99-server-pilot.zip `
   -DestinationRoot C:\MU99\out
 ```
 
@@ -86,11 +96,11 @@ Gera `reports\diagnostico-<timestamp>.json`.
 
 ```powershell
 .\mu99-vps\Install-MU99-Safe.ps1 -Mode PrepararArquivos `
-  -PackageZipPath C:\pacotes\pacote-99b.zip `
+  -PackageZipPath .\packages\mu99-server-pilot.zip `
   -DestinationRoot C:\MU99\stage-20261010-1200 -WhatIf   # simula primeiro
 
 .\mu99-vps\Install-MU99-Safe.ps1 -Mode PrepararArquivos `
-  -PackageZipPath C:\pacotes\pacote-99b.zip `
+  -PackageZipPath .\packages\mu99-server-pilot.zip `
   -DestinationRoot C:\MU99\stage-20261010-1200
 ```
 
