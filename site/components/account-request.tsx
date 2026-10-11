@@ -24,11 +24,11 @@ export function AccountRequest() {
     const password = String(data.get('password') ?? '')
 
     if (!LOGIN_PATTERN.test(login)) {
-      setStatus({ kind: 'error', message: 'O login precisa ter de 4 a 10 caracteres, apenas letras e números.' })
+      setStatus({ kind: 'error', message: 'O login precisa ter de 4 a 10 caracteres, apenas letras e nÃºmeros.' })
       return
     }
-    if (password.length < 4 || password.length > 20 || /\s/.test(password)) {
-      setStatus({ kind: 'error', message: 'A senha precisa ter de 4 a 20 caracteres, sem espaços.' })
+    if (password.length < 4 || password.length > 10 || /\s/.test(password)) {
+      setStatus({ kind: 'error', message: 'A senha precisa ter de 4 a 10 caracteres, sem espaÃ§os.' })
       return
     }
 
@@ -97,7 +97,7 @@ export function AccountRequest() {
                 placeholder="ex: guerreiro"
               />
               <p id="login-hint" className="text-xs text-muted-foreground">
-                4 a 10 caracteres, apenas letras e números.
+                4 a 10 caracteres, apenas letras e nÃºmeros.
               </p>
             </div>
             <div className="flex flex-col gap-2">
@@ -110,10 +110,10 @@ export function AccountRequest() {
                 type="password"
                 required
                 minLength={4}
-                maxLength={20}
+                maxLength={10}
                 autoComplete="new-password"
                 className="h-11 rounded-sm border border-input bg-background px-3 text-foreground placeholder:text-muted-foreground/60 focus-visible:border-primary focus-visible:outline-none"
-                placeholder="4 a 20 caracteres, sem espaços"
+                placeholder="4 a 10 caracteres, sem espaÃ§os"
               />
             </div>
             {status.kind === 'error' ? (
