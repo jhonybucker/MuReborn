@@ -13,4 +13,5 @@ export const SERVER = {
   masterStatCap: 65000,
   maxAccountsPerIp: 5,
   apiUrl: 'https://mu-reborn.duckdns.org/api/signup',
+  apiBase: 'https://mu-reborn.duckdns.org/api',
 } as const
