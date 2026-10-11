@@ -6,7 +6,7 @@ import { SERVER } from '@/lib/server-info'
 
 const CLASSES = ['Dark Wizard', 'Dark Knight', 'Fairy Elf', 'Magic Gladiator', 'Dark Lord'] as const
 
-type Row = { name: string; level: number; class: number; master: boolean }
+type Row = { name: string; level: number; class: number; master: boolean; resets: number }
 
 export function Rankings() {
   const [online, setOnline] = useState<number | null>(null)
@@ -66,6 +66,7 @@ export function Rankings() {
               <th>Nome</th>
               <th>Classe</th>
               <th>Level</th>
+              <th>Resets</th>
               <th>Master</th>
             </tr>
           </thead>
@@ -76,13 +77,14 @@ export function Rankings() {
                 <td className="font-mono text-foreground">{r.name}</td>
                 <td>{CLASSES[(r.class >> 4) % 5] ?? '?'}</td>
                 <td className="font-mono">{r.level}</td>
+                <td className="font-mono">{r.resets}</td>
                 <td>{r.master ? '⭐' : '—'}</td>
               </tr>
             ))}
           </tbody>
         </table>
         <p className="mt-4 text-xs text-muted-foreground">
-          Resets não têm ranking: o motor não guarda contador de resets.
+          Resets contados a partir de hoje (queda de level 400+); resets anteriores não são rastreados pelo motor.
         </p>
       </div>
     </section>
