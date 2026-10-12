@@ -32,7 +32,7 @@ export function Rankings() {
       }
     }
     load()
-    const t = setInterval(load, 60000)
+    const t = setInterval(load, 300000)
     return () => {
       alive = false
       clearInterval(t)
