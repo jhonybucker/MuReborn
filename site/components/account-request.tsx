@@ -54,7 +54,7 @@ export function AccountRequest() {
     <section id="conta" className="mx-auto grid max-w-6xl gap-12 px-4 py-24 md:px-6 lg:grid-cols-2">
       <SectionHeading
         eyebrow="Criar conta"
-        title="Servidor somente para convidados."
+        title="Crie sua conta e jogue."
         description="Crie sua conta na hora e entre no jogo em seguida."
       />
 

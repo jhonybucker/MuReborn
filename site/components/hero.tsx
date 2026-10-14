@@ -1,6 +1,5 @@
 import Image from 'next/image'
 import { Download, Swords } from 'lucide-react'
-import { CopyButton } from '@/components/copy-button'
 import { SERVER } from '@/lib/server-info'
 
 export function Hero() {
@@ -52,13 +51,13 @@ export function Hero() {
               href="#conta"
               className="inline-flex items-center gap-2 rounded-sm border border-primary/60 px-6 py-3 font-semibold text-primary transition-colors hover:bg-primary/10"
             >
-              Pedir conta
+              Criar conta
             </a>
           </div>
         </div>
 
         <dl
-          className="animate-rise gold-frame grid grid-cols-2 bg-card/80 backdrop-blur-sm md:grid-cols-4"
+          className="animate-rise gold-frame grid grid-cols-2 bg-card/80 backdrop-blur-sm md:grid-cols-3"
           style={{ animationDelay: '480ms' }}
         >
           <div className="flex flex-col gap-1 border-b border-r border-border p-4 md:border-b-0">
@@ -69,16 +68,9 @@ export function Hero() {
             <dt className="text-xs uppercase tracking-widest text-muted-foreground">Drop</dt>
             <dd className="font-serif text-2xl font-bold text-foreground">{SERVER.rates.drop}</dd>
           </div>
-          <div className="flex flex-col gap-1 border-r border-border p-4">
+          <div className="flex flex-col gap-1 p-4">
             <dt className="text-xs uppercase tracking-widest text-muted-foreground">Zen</dt>
             <dd className="font-serif text-2xl font-bold text-foreground">{SERVER.rates.zen}</dd>
-          </div>
-          <div className="flex flex-col gap-1 p-4">
-            <dt className="text-xs uppercase tracking-widest text-muted-foreground">IP do servidor</dt>
-            <dd className="flex flex-wrap items-center justify-between gap-2">
-              <span className="font-mono text-lg text-foreground">{SERVER.ip}</span>
-              <CopyButton value={SERVER.ip} label="Copiar" className="px-2" />
-            </dd>
           </div>
         </dl>
       </div>

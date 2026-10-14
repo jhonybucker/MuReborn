@@ -26,6 +26,12 @@ const classes = [
     image: '/images/magic-gladiator.png',
     text: 'Híbrido de espada e magia. Liberado ao alcançar o level 220 com outro personagem.',
   },
+  {
+    name: 'Dark Lord',
+    evolution: 'Comandante',
+    image: '',
+    text: 'Lidera corvos e cavalos sombrios. Força bruta com comando e presença de campo.',
+  },
 ]
 
 export function Classes() {
@@ -34,21 +40,27 @@ export function Classes() {
       <SectionHeading
         eyebrow="Classes"
         title="Escolha seu caminho."
-        description="As quatro classes originais da versão 99b, cada uma com seu estilo de jogo e sua evolução."
+        description="As cinco classes da versão 99b, cada uma com seu estilo de jogo e sua evolução."
       />
-      <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
         {classes.map((cls) => (
           <li key={cls.name} className="group gold-frame flex flex-col overflow-hidden bg-card">
-            <div className="relative aspect-[3/4] overflow-hidden">
-              <Image
-                src={cls.image || '/placeholder.svg'}
-                alt={`Arte do personagem ${cls.name}`}
-                fill
-                sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-                className="object-cover transition-transform duration-700 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-card via-card/10 to-transparent" />
-            </div>
+            {cls.image ? (
+              <div className="relative aspect-[3/4] overflow-hidden">
+                <Image
+                  src={cls.image}
+                  alt={`Arte do personagem ${cls.name}`}
+                  fill
+                  sizes="(min-width: 1024px) 20vw, (min-width: 640px) 50vw, 100vw"
+                  className="object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-card via-card/10 to-transparent" />
+              </div>
+            ) : (
+              <div className="flex aspect-[3/4] items-center justify-center bg-gradient-to-b from-accent/30 to-card">
+                <span className="font-serif text-6xl font-black text-primary">DL</span>
+              </div>
+            )}
             <div className="flex flex-col gap-2 p-5">
               <p className="text-xs uppercase tracking-widest text-primary">{cls.evolution}</p>
               <h3 className="font-serif text-xl font-bold tracking-wide">{cls.name}</h3>

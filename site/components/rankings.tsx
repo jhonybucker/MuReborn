@@ -83,9 +83,6 @@ export function Rankings() {
             ))}
           </tbody>
         </table>
-        <p className="mt-4 text-xs text-muted-foreground">
-          Resets contados a partir de hoje (queda de level 400+); resets anteriores não são rastreados pelo motor.
-        </p>
       </div>
     </section>
   )

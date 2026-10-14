@@ -2,11 +2,11 @@ export const SERVER = {
   name: 'MU Reborn',
   version: '99b',
   ip: '102.165.46.30',
-  clientUrl: 'https://mega.nz/file/0AFSySRQ#6gM2NJERj88DxibQ__qNhlBvcmL1vF5T_PkX5Xlujds',
+  clientUrl: 'https://mega.nz/file/dVd2mKJB#6gM2NJERj88DxibQ__qNhlBvcmL1vF5T_PkX5Xlujds',
   rates: {
     exp: '1000%',
     drop: '50%',
-    zen: '50%',
+    zen: '300%',
   },
   resetLevel: 400,
   statCap: 32767,
