@@ -6,7 +6,7 @@ export const SERVER = {
   rates: {
     exp: '1000%',
     drop: '50%',
-    zen: '300%',
+    zen: '50%',
   },
   resetLevel: 400,
   statCap: 32767,
