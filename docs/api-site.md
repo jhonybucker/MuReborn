@@ -137,6 +137,7 @@ Perfil público. `name` vem codificado na URL (`encodeURIComponent`).
 | `option` | opcional: opção adicional em pontos (4, 8, 12, 16…) |
 | `excellent` | opcional: opções excelentes já em texto em português |
 | `ancient` | opcional: nome do set ancient, ou `null` |
+| `group`, `index` | opcional: grupo e índice do item no `Item.txt` (ex.: grupo 5, índice 10). Com eles o site mostra a imagem `/images/items/<grupo>-<indice>.webp`, se existir; sem imagem, mostra o nome |
 
 Mande só os espaços ocupados; os que faltarem o site mostra como "Vazio".
 
