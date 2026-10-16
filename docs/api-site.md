@@ -103,6 +103,11 @@ Perfil público. `name` vem codificado na URL (`encodeURIComponent`).
 
 - Não existe: **404** `{ "ok": false, "error": "not_found" }`.
 - `guild`: `null` quando o personagem não tem guild.
+- Campos **opcionais** (o site mostra cada um só quando vier):
+  - `rank`: posição no ranking geral (1 = primeiro).
+  - `playedHours`: horas jogadas, número inteiro.
+  - `lastSeen`: último acesso, ISO 8601 com fuso (ignorado se `online` for true).
+  - `createdAt`: data de criação do personagem, ISO 8601.
 - **Não** devolver zen, mapa, coordenadas nem o login da conta: o perfil é aberto a qualquer pessoa,
   e posição em tempo real facilita perseguir jogadores.
 
@@ -185,11 +190,16 @@ As rotas abaixo recebem `Authorization: Bearer <token>`. Token ausente, inválid
       "zen": 15000000,
       "map": 0,
       "x": 135,
-      "y": 128
+      "y": 128,
+      "guild": "Lendas"
     }
-  ]
+  ],
+  "account": { "createdAt": "2026-03-12T18:00:00-03:00", "lastLogin": "2026-10-16T21:40:00-03:00" }
 }
 ```
+
+`guild` (nome ou `null`) e o objeto `account` são **opcionais**: o painel mostra a guild de cada
+personagem e "Criada em" / "Último acesso" da conta só quando vierem.
 
 Colunas prováveis na tabela `Character` (confirmar no banco de vocês):
 

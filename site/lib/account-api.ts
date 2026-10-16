@@ -7,6 +7,7 @@ export type Character = {
   resets: number
   master: boolean
   online: boolean
+  guild?: string | null
   strength: number
   agility: number
   vitality: number
@@ -19,24 +20,39 @@ export type Character = {
   y: number
 }
 
+/** Dados da conta; opcionais até a API mandar (docs/api-site.md). */
+export type AccountInfo = { createdAt?: string; lastLogin?: string }
+
 export type Session = { token: string; login: string }
 
 const TOKEN_KEY = 'mu-reborn-session'
 
-// sessionStorage: a sessão some ao fechar o navegador. Pode falhar em aba anônima, então tudo em try/catch.
+// Sem "manter conectado": sessionStorage (some ao fechar o navegador).
+// Com: localStorage (fica até sair ou o token expirar na API).
+// Os dois podem falhar em aba anônima, então tudo em try/catch.
 export function loadSession(): Session | null {
-  try {
-    const raw = sessionStorage.getItem(TOKEN_KEY)
-    return raw ? (JSON.parse(raw) as Session) : null
-  } catch {
-    return null
+  for (const storage of [() => sessionStorage, () => localStorage]) {
+    try {
+      const raw = storage().getItem(TOKEN_KEY)
+      if (raw) return JSON.parse(raw) as Session
+    } catch {
+      /* storage indisponível */
+    }
   }
+  return null
 }
 
-export function saveSession(session: Session | null) {
+export function saveSession(session: Session | null, remember = false) {
+  for (const storage of [() => sessionStorage, () => localStorage]) {
+    try {
+      storage().removeItem(TOKEN_KEY)
+    } catch {
+      /* storage indisponível */
+    }
+  }
+  if (!session) return
   try {
-    if (session) sessionStorage.setItem(TOKEN_KEY, JSON.stringify(session))
-    else sessionStorage.removeItem(TOKEN_KEY)
+    ;(remember ? localStorage : sessionStorage).setItem(TOKEN_KEY, JSON.stringify(session))
   } catch {
     /* sem storage: a sessão vale só enquanto a página estiver aberta */
   }
@@ -58,9 +74,11 @@ export async function login(user: string, password: string): Promise<Session> {
   }
 }
 
-export async function fetchCharacters(session: Session): Promise<Character[]> {
-  const body = await api<{ characters?: Character[] }>('/me/characters', { token: session.token })
-  return body.characters ?? []
+export async function fetchCharacters(session: Session): Promise<{ characters: Character[]; account: AccountInfo }> {
+  const body = await api<{ characters?: Character[]; account?: AccountInfo }>('/me/characters', {
+    token: session.token,
+  })
+  return { characters: body.characters ?? [], account: body.account ?? {} }
 }
 
 export async function changePassword(session: Session, currentPassword: string, newPassword: string) {
