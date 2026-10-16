@@ -90,15 +90,15 @@ export function Rankings() {
         </div>
 
         <div className="flex min-w-0 flex-1 flex-col justify-center overflow-x-auto">
-          <table className="w-full min-w-[560px] border-separate border-spacing-y-2.5">
+          <table className="w-full border-separate border-spacing-y-2.5">
             <thead>
               <tr className="text-[11px] tracking-[0.22em] text-[#6f86b3] uppercase">
-                <th className="w-14" />
+                <th className="w-12 sm:w-14" />
                 <th className="text-left font-normal">Personagem</th>
-                <th className="w-40 font-normal">Classe</th>
-                <th className="w-20 text-right font-normal">Level</th>
-                <th className="w-20 text-right font-normal">Resets</th>
-                <th className="w-12 pr-7 font-normal">
+                <th className="hidden w-40 font-normal sm:table-cell">Classe</th>
+                <th className="w-14 text-right font-normal sm:w-20">Level</th>
+                <th className="w-14 text-right font-normal sm:w-20">Resets</th>
+                <th className="w-10 pr-4 font-normal sm:w-12 sm:pr-7">
                   <abbr title="Master reset" className="no-underline">
                     M
                   </abbr>
@@ -122,24 +122,29 @@ export function Rankings() {
                         : '[&>td]:border-[rgb(130_175_255/0.26)]'
                     }`}
                   >
-                    <td className="py-2.5 pl-2.5">
+                    <td className="py-2 pl-2 sm:py-2.5 sm:pl-2.5">
                       <span
-                        className={`flex size-11 items-center justify-center rounded-full border border-input bg-secondary font-serif text-lg font-black text-muted-foreground ${
+                        className={`flex size-9 items-center justify-center rounded-full sm:size-11 border border-input bg-secondary font-serif text-lg font-black text-muted-foreground ${
                           MEDALS[i] ?? ''
                         }`}
                       >
                         {i + 1}
                       </span>
                     </td>
-                    <td className="font-serif text-lg font-bold">{r.name}</td>
-                    <td className="text-center">
+                    <td className="max-w-0 truncate pl-2 font-serif font-bold sm:text-lg">
+                      {r.name}
+                      <span className="block text-[11px] font-normal tracking-[0.12em] text-muted-foreground uppercase sm:hidden">
+                        {className(r.class)}
+                      </span>
+                    </td>
+                    <td className="hidden text-center sm:table-cell">
                       <span className="inline-block w-36 rounded-full border border-primary/30 bg-primary/15 px-3 py-1.5 text-xs tracking-[0.12em] text-[#a9bde0] uppercase">
                         {className(r.class)}
                       </span>
                     </td>
-                    <td className="text-right font-serif text-2xl font-black text-[#8cc4ff]">{r.level}</td>
+                    <td className="text-right font-serif text-xl font-black text-[#8cc4ff] sm:text-2xl">{r.level}</td>
                     <td className="text-right text-muted-foreground">↺ {r.resets}</td>
-                    <td className="pr-7 text-center text-xl text-accent">
+                    <td className="pr-4 text-center text-xl text-accent sm:pr-7">
                       {r.master ? <span aria-label="Master reset">★</span> : null}
                     </td>
                   </tr>

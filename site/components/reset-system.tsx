@@ -50,12 +50,12 @@ export function ResetSystem() {
           />
           <div className="md:text-right">
             <p className="text-[11px] tracking-[0.26em] text-muted-foreground uppercase">Teto de atributos</p>
-            <p className="mt-2.5 flex items-baseline gap-4 font-serif md:justify-end">
-              <span className="text-3xl text-[#6f86b3] line-through decoration-[#6f86b3]/50">{fmt(SERVER.statCap)}</span>
+            <p className="mt-2.5 flex flex-wrap items-baseline gap-x-4 gap-y-1 font-serif md:justify-end">
+              <span className="text-2xl text-[#6f86b3] line-through decoration-[#6f86b3]/50 md:text-3xl">{fmt(SERVER.statCap)}</span>
               <span className="text-[28px] text-accent" aria-hidden>
                 →
               </span>
-              <span className="text-gold text-5xl leading-none font-black md:text-[64px]">{fmt(SERVER.masterStatCap)}</span>
+              <span className="text-gold text-[44px] leading-none font-black md:text-[64px]">{fmt(SERVER.masterStatCap)}</span>
             </p>
           </div>
         </div>

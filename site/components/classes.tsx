@@ -52,17 +52,22 @@ export function Classes() {
             As cinco classes da versão 99b, cada uma com seu estilo de jogo e sua evolução.
           </p>
         </div>
-        <ul className="grid gap-[18px] sm:grid-cols-2 lg:grid-cols-5">
+        {/* Celular e tablet: carrossel com arraste lateral e encaixe no centro; desktop: 5 colunas. */}
+        <ul
+          tabIndex={0}
+          aria-label="Classes: arraste para o lado para ver todas"
+          className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth px-4 py-4 md:-mx-16 md:px-16 [scrollbar-width:none] focus-visible:outline-2 focus-visible:outline-ring lg:mx-0 lg:grid lg:snap-none lg:grid-cols-5 lg:gap-[18px] lg:overflow-visible lg:p-0 [&::-webkit-scrollbar]:hidden"
+        >
           {classes.map((cls) => (
             <li
               key={cls.name}
-              className="group gold-ring relative h-[468px] overflow-hidden rounded-t-[108px] rounded-b-[30px]"
+              className="group gold-ring relative h-[440px] w-[78%] shrink-0 snap-center overflow-hidden rounded-t-[108px] rounded-b-[30px] sm:w-[44%] lg:h-[468px] lg:w-auto"
             >
               <Image
                 src={cls.image}
                 alt={`Arte do personagem ${cls.name}`}
                 fill
-                sizes="(min-width: 1024px) 20vw, (min-width: 640px) 50vw, 100vw"
+                sizes="(min-width: 1024px) 20vw, (min-width: 640px) 44vw, 78vw"
                 className={`object-cover transition-transform duration-700 group-hover:scale-105 ${cls.position}`}
               />
               <div className="absolute inset-0 bg-[linear-gradient(0deg,#040916_4%,rgb(4_9_22/0.78)_34%,rgb(4_9_22/0)_62%)]" />
@@ -74,6 +79,9 @@ export function Classes() {
             </li>
           ))}
         </ul>
+        <p className="-mt-4 flex items-center justify-center gap-2 text-xs tracking-[0.2em] text-muted-foreground uppercase lg:hidden" aria-hidden>
+          Arraste para ver todas <span className="text-accent">→</span>
+        </p>
       </div>
     </section>
   )
