@@ -4,11 +4,11 @@ export const CLASSES = ['Dark Wizard', 'Dark Knight', 'Fairy Elf', 'Magic Gladia
 const EVOLUTIONS: (string | null)[] = ['Soul Master', 'Blade Knight', 'Muse Elf', null, null]
 
 const CLASS_IMAGES: (string | null)[] = [
-  '/images/dark-wizard.png',
-  '/images/dark-knight.png',
-  '/images/fairy-elf.png',
-  '/images/magic-gladiator.png',
-  null,
+  '/images/classes/dark-wizard.webp',
+  '/images/classes/dark-knight.webp',
+  '/images/classes/fairy-elf.webp',
+  '/images/classes/magic-gladiator.webp',
+  '/images/classes/dark-lord.webp',
 ]
 
 const MAPS: Record<number, string> = {

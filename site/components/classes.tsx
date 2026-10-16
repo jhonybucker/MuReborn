@@ -5,36 +5,36 @@ const classes = [
   {
     name: 'Dark Knight',
     evolution: 'Blade Knight',
-    image: '/images/dark-knight.png',
-    position: 'object-[50%_30%]',
+    image: '/images/classes/dark-knight.webp',
+    position: 'object-[50%_20%]',
     text: 'Corpo a corpo puro. Muita vida, dano físico brutal e o temido Twisting Slash.',
   },
   {
     name: 'Dark Wizard',
     evolution: 'Soul Master',
-    image: '/images/dark-wizard.png',
-    position: 'object-[50%_20%]',
+    image: '/images/classes/dark-wizard.webp',
+    position: 'object-[50%_15%]',
     text: 'Domina a magia arcana. Evil Spirit e Hellfire limpam mapas inteiros.',
   },
   {
     name: 'Fairy Elf',
     evolution: 'Muse Elf',
-    image: '/images/fairy-elf.png',
-    position: 'object-[50%_25%]',
+    image: '/images/classes/fairy-elf.webp',
+    position: 'object-[50%_15%]',
     text: 'Arqueira e suporte. Buffs de defesa e dano que toda party quer por perto.',
   },
   {
     name: 'Magic Gladiator',
     evolution: 'Classe especial',
-    image: '/images/magic-gladiator.png',
-    position: 'object-[50%_25%]',
+    image: '/images/classes/magic-gladiator.webp',
+    position: 'object-[50%_15%]',
     text: 'Híbrido de espada e magia. Liberado ao alcançar o level 220 com outro personagem.',
   },
   {
     name: 'Dark Lord',
     evolution: 'Comandante',
-    image: '',
-    position: '',
+    image: '/images/classes/dark-lord.webp',
+    position: 'object-[50%_15%]',
     text: 'Lidera corvos e cavalos sombrios. Força bruta com comando e presença de campo.',
   },
 ]
@@ -58,36 +58,13 @@ export function Classes() {
               key={cls.name}
               className="group gold-ring relative h-[468px] overflow-hidden rounded-t-[108px] rounded-b-[30px]"
             >
-              {cls.image ? (
-                <Image
-                  src={cls.image}
-                  alt={`Arte do personagem ${cls.name}`}
-                  fill
-                  sizes="(min-width: 1024px) 20vw, (min-width: 640px) 50vw, 100vw"
-                  className={`object-cover transition-transform duration-700 group-hover:scale-105 ${cls.position}`}
-                />
-              ) : (
-                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_30%,rgb(90_162_255/0.55),rgb(61_20_110/0.85)_55%,#08051a)]">
-                  <svg viewBox="0 0 200 300" className="absolute inset-0 size-full" aria-hidden>
-                    <g fill="none" stroke="#bfe0ff" strokeOpacity=".5">
-                      <circle cx="100" cy="110" r="62" />
-                      <circle cx="100" cy="110" r="44" strokeOpacity=".3" />
-                      <path d="M100 38v144M28 110h144M49 59l102 102M151 59L49 161" strokeOpacity=".22" />
-                    </g>
-                    <text
-                      x="100"
-                      y="132"
-                      textAnchor="middle"
-                      fontFamily="var(--font-cinzel), serif"
-                      fontWeight="900"
-                      fontSize="64"
-                      fill="#e9f0fb"
-                    >
-                      DL
-                    </text>
-                  </svg>
-                </div>
-              )}
+              <Image
+                src={cls.image}
+                alt={`Arte do personagem ${cls.name}`}
+                fill
+                sizes="(min-width: 1024px) 20vw, (min-width: 640px) 50vw, 100vw"
+                className={`object-cover transition-transform duration-700 group-hover:scale-105 ${cls.position}`}
+              />
               <div className="absolute inset-0 bg-[linear-gradient(0deg,#040916_4%,rgb(4_9_22/0.78)_34%,rgb(4_9_22/0)_62%)]" />
               <div className="absolute inset-x-5 bottom-[22px] text-center">
                 <p className="text-[10px] font-semibold tracking-[0.22em] text-accent uppercase">{cls.evolution}</p>
