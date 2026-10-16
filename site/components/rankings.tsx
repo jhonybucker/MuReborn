@@ -2,9 +2,8 @@
 
 import { useEffect, useState } from 'react'
 import { SectionHeading } from '@/components/section-heading'
+import { className } from '@/lib/mu'
 import { SERVER } from '@/lib/server-info'
-
-const CLASSES = ['Dark Wizard', 'Dark Knight', 'Fairy Elf', 'Magic Gladiator', 'Dark Lord'] as const
 
 // Ouro, prata e bronze para o pódio.
 const MEDALS = [
@@ -135,7 +134,7 @@ export function Rankings() {
                     <td className="font-serif text-lg font-bold">{r.name}</td>
                     <td className="text-center">
                       <span className="inline-block w-36 rounded-full border border-primary/30 bg-primary/15 px-3 py-1.5 text-xs tracking-[0.12em] text-[#a9bde0] uppercase">
-                        {CLASSES[(r.class >> 4) % 5] ?? '?'}
+                        {className(r.class)}
                       </span>
                     </td>
                     <td className="text-right font-serif text-2xl font-black text-[#8cc4ff]">{r.level}</td>
