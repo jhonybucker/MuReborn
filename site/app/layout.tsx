@@ -1,5 +1,6 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
+import Image from 'next/image'
 import { Cinzel, Inter } from 'next/font/google'
 import './globals.css'
 
@@ -23,7 +24,7 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   colorScheme: 'dark',
-  themeColor: '#0f0d0b',
+  themeColor: '#040916',
 }
 
 export default function RootLayout({
@@ -34,6 +35,11 @@ export default function RootLayout({
   return (
     <html lang="pt-BR" className={`${cinzel.variable} ${inter.variable} bg-background`}>
       <body className="antialiased">
+        {/* Fundo fixo da página inteira, escurecido para o texto das seções continuar legível. */}
+        <div className="fixed inset-0 -z-10" aria-hidden>
+          <Image src="/fundo.png" alt="" fill sizes="100vw" className="object-cover object-[60%_50%]" />
+          <div className="absolute inset-0 bg-[rgb(4_9_22/0.86)]" />
+        </div>
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
       </body>

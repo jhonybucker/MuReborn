@@ -5,24 +5,24 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  --background: #0f0d0b;
-  --foreground: #e9dfc8;
-  --card: #1a1612;
-  --card-foreground: #e9dfc8;
-  --popover: #1a1612;
-  --popover-foreground: #e9dfc8;
-  --primary: #c9a24a;
-  --primary-foreground: #0f0d0b;
-  --secondary: #1a1612;
-  --secondary-foreground: #e9dfc8;
-  --muted: #1a1612;
-  --muted-foreground: #a3977f;
-  --accent: #9b2420;
-  --accent-foreground: #e9dfc8;
-  --destructive: #9b2420;
-  --border: #3a3024;
-  --input: #3a3024;
-  --ring: #c9a24a;
+  --background: #040916;
+  --foreground: #dce7ff;
+  --card: #0a1631;
+  --card-foreground: #dce7ff;
+  --popover: #0a1631;
+  --popover-foreground: #dce7ff;
+  --primary: #3d8bff;
+  --primary-foreground: #ffffff;
+  --secondary: #0d1c3d;
+  --secondary-foreground: #dce7ff;
+  --muted: #0d1c3d;
+  --muted-foreground: #8ea4cc;
+  --accent: #f0b443;
+  --accent-foreground: #1a1205;
+  --destructive: #e5484d;
+  --border: #1c3466;
+  --input: #22407a;
+  --ring: #5aa2ff;
   --radius: 0.25rem;
 }
 
@@ -63,22 +63,113 @@
     scroll-behavior: smooth;
   }
   body {
-    @apply bg-background text-foreground font-sans;
+    @apply text-foreground font-sans;
   }
 }
 
-@utility gold-frame {
-  border: 1px solid color-mix(in oklab, var(--primary) 55%, transparent);
+/* Vidro azul translúcido: header, cards e linhas do ranking. */
+@utility glass {
+  border: 1px solid rgb(130 175 255 / 0.28);
+  background: linear-gradient(160deg, rgb(20 44 100 / 0.58), rgb(5 12 32 / 0.85));
   box-shadow:
-    inset 0 0 0 3px var(--background),
-    inset 0 0 0 4px color-mix(in oklab, var(--primary) 30%, transparent);
+    0 24px 60px -24px #000,
+    inset 0 1px 0 rgb(255 255 255 / 0.12);
+}
+
+/* Moldura dourada dos cards em arco. */
+@utility gold-ring {
+  border: 1px solid rgb(240 180 67 / 0.5);
+  box-shadow:
+    0 0 0 6px rgb(240 180 67 / 0.07),
+    0 30px 70px -20px #000;
 }
 
 @utility text-gold {
-  background: linear-gradient(180deg, #f1dc9c 0%, var(--primary) 45%, #7a5a1e 100%);
+  background: linear-gradient(180deg, #fff3c4 0%, #f7c955 40%, #c9780f 70%, #ffd774 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+}
+
+@utility text-chrome {
+  background: linear-gradient(180deg, #ffffff 0%, #d4def0 40%, #66789a 52%, #e9f0fb 70%, #8d9dbb 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Rótulo dourado com filete antes do título de cada seção. */
+@utility eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  &::before {
+    content: '';
+    width: 44px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent));
+  }
+}
+
+/* Botão principal: pílula azul brilhante. */
+@utility btn-play {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  border: 1px solid #bfe0ff;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #6fb0ff 0%, #2266e6 48%, #0f37a3 100%);
+  color: #ffffff;
+  font-family: var(--font-serif);
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  box-shadow:
+    0 0 0 4px rgb(61 139 255 / 0.18),
+    0 10px 40px -6px rgb(61 139 255 / 0.9),
+    inset 0 1px 0 rgb(255 255 255 / 0.55);
+  transition:
+    filter 0.2s,
+    box-shadow 0.2s;
+  &:hover {
+    filter: brightness(1.12);
+    box-shadow:
+      0 0 0 4px rgb(61 139 255 / 0.28),
+      0 12px 48px -4px rgb(61 139 255 / 1),
+      inset 0 1px 0 rgb(255 255 255 / 0.6);
+  }
+  &:disabled {
+    filter: saturate(0.4);
+    opacity: 0.7;
+  }
+}
+
+/* Botão secundário: pílula escura com borda dourada. */
+@utility btn-frame {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 1px solid rgb(240 180 67 / 0.5);
+  border-radius: 999px;
+  background: rgb(4 9 22 / 0.55);
+  color: #f7dfa4;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+  &:hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 22px -6px var(--accent);
+  }
 }
 
 @keyframes rise {

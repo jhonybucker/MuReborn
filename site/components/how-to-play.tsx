@@ -1,72 +1,88 @@
 import { Download, Play, UserPlus } from 'lucide-react'
-import { SectionHeading } from '@/components/section-heading'
 import { SERVER } from '@/lib/server-info'
+
+const steps = [
+  {
+    icon: Download,
+    title: 'Baixe o cliente',
+    text: `Faça o download do cliente ${SERVER.version} oficial do MU Reborn e extraia em uma pasta.`,
+    cta: { label: 'Download (MEGA)', href: SERVER.clientUrl, external: true, primary: true },
+  },
+  {
+    icon: UserPlus,
+    title: 'Crie sua conta',
+    text: 'Cadastre login e senha na hora, sem esperar ninguém.',
+    cta: { label: 'Criar conta', href: '#conta', external: false, primary: true },
+  },
+  {
+    icon: Play,
+    title: 'Entre no jogo',
+    text: null,
+    cta: { label: 'Ainda sem conta?', href: '#conta', external: false, primary: false },
+  },
+]
 
 export function HowToPlay() {
   return (
-    <section id="comecar" className="border-y border-border bg-card">
-      <div className="mx-auto flex max-w-6xl flex-col gap-12 px-4 py-24 md:px-6">
-        <SectionHeading
-          eyebrow="Como jogar"
-          title="Três passos até Lorencia."
-          description="Use exatamente o cliente abaixo. Outros clientes ou versões não conectam ao servidor."
-        />
-        <ol className="grid gap-6 lg:grid-cols-3">
-          <li className="flex flex-col gap-5 border border-border bg-background p-6">
-            <div className="flex items-center justify-between">
-              <span className="font-serif text-sm text-muted-foreground">Passo 1</span>
-              <Download className="size-5 text-primary" aria-hidden />
-            </div>
-            <h3 className="font-serif text-xl font-bold tracking-wide">Baixe o cliente</h3>
-            <p className="leading-relaxed text-muted-foreground">
-              Faça o download do cliente {SERVER.version} oficial do MU Reborn e extraia em uma pasta.
-            </p>
-            <a
-              href={SERVER.clientUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-auto inline-flex w-fit items-center gap-2 rounded-sm bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
-            >
-              <Download className="size-4" aria-hidden />
-              Download (MEGA)
-            </a>
-          </li>
+    <section
+      id="comecar"
+      className="bg-[radial-gradient(ellipse_60%_60%_at_50%_0%,rgb(61_139_255/0.28),transparent_70%),radial-gradient(ellipse_50%_40%_at_50%_100%,rgb(240_180_67/0.1),transparent_70%)]"
+    >
+      <div className="mx-auto flex max-w-7xl flex-col gap-14 px-4 py-24 md:px-20">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <p className="eyebrow after:h-px after:w-11 after:bg-gradient-to-l after:from-transparent after:to-accent after:content-['']">
+            Como jogar
+          </p>
+          <h2 className="text-chrome font-serif text-4xl leading-[1.02] font-black text-balance md:text-6xl">
+            Três passos até Lorencia.
+          </h2>
+          <p className="text-lg text-muted-foreground">
+            Use exatamente o cliente oficial. Outros clientes ou versões não conectam ao servidor.
+          </p>
+        </div>
 
-          <li className="flex flex-col gap-5 border border-border bg-background p-6">
-            <div className="flex items-center justify-between">
-              <span className="font-serif text-sm text-muted-foreground">Passo 2</span>
-              <UserPlus className="size-5 text-primary" aria-hidden />
-            </div>
-            <h3 className="font-serif text-xl font-bold tracking-wide">Crie sua conta</h3>
-            <p className="leading-relaxed text-muted-foreground">
-              Cadastre login e senha na hora, sem esperar ninguém.
-            </p>
-            <a
-              href="#conta"
-              className="mt-auto inline-flex w-fit items-center gap-2 rounded-sm bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
-            >
-              Criar conta
-            </a>
-          </li>
-
-          <li className="flex flex-col gap-5 border border-border bg-background p-6">
-            <div className="flex items-center justify-between">
-              <span className="font-serif text-sm text-muted-foreground">Passo 3</span>
-              <Play className="size-5 text-primary" aria-hidden />
-            </div>
-            <h3 className="font-serif text-xl font-bold tracking-wide">Entre no jogo</h3>
-            <p className="leading-relaxed text-muted-foreground">
-              Abra o <code className="font-mono text-foreground">main.exe</code>, escolha o servidor MU Reborn e entre com
-              o login e a senha que você criou abaixo.
-            </p>
-            <a
-              href="#conta"
-              className="mt-auto inline-flex w-fit items-center gap-2 rounded-sm border border-primary/60 px-4 py-2 text-sm font-semibold text-primary transition-colors hover:bg-primary/10"
-            >
-              Ainda sem conta?
-            </a>
-          </li>
-        </ol>
+        <div className="relative">
+          <span
+            className="absolute inset-x-[150px] top-[66px] hidden border-t-2 border-dashed border-accent/50 lg:block"
+            aria-hidden
+          />
+          <ol className="relative grid gap-9 lg:grid-cols-3">
+            {steps.map(({ icon: Icon, title, text, cta }, index) => (
+              <li
+                key={title}
+                className="glass relative flex min-h-[340px] flex-col overflow-hidden rounded-[48px] bg-[linear-gradient(160deg,rgb(22_50_115/0.7),rgb(5_12_32/0.95))] p-[34px]"
+              >
+                <span
+                  className="absolute -top-1.5 right-[22px] font-serif text-[150px] leading-none font-black text-[rgb(130_175_255/0.1)]"
+                  aria-hidden
+                >
+                  {index + 1}
+                </span>
+                <span className="relative flex size-16 items-center justify-center rounded-full border border-[rgb(140_196_255/0.55)] bg-[radial-gradient(circle,rgb(90_162_255/0.4),rgb(61_139_255/0.1))] text-[#e6f1ff] shadow-[0_0_30px_-4px_var(--primary)]">
+                  <Icon className="size-[30px]" strokeWidth={1.9} aria-hidden />
+                </span>
+                <h3 className="relative mt-[26px] mb-2.5 font-serif text-[27px] font-black">{title}</h3>
+                <p className="relative mb-7 leading-relaxed text-[#a9bde0]">
+                  {text ?? (
+                    <>
+                      Abra o <code className="font-mono text-foreground">main.exe</code>, escolha o servidor MU Reborn e
+                      entre com o login e a senha que você criou.
+                    </>
+                  )}
+                </p>
+                <a
+                  href={cta.href}
+                  {...(cta.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
+                  className={`relative mt-auto w-fit px-7 ${
+                    cta.primary ? 'btn-play h-[50px] text-[13px]' : 'btn-frame h-[50px] text-xs'
+                  }`}
+                >
+                  {cta.label}
+                </a>
+              </li>
+            ))}
+          </ol>
+        </div>
       </div>
     </section>
   )

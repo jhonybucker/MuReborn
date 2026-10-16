@@ -1,4 +1,3 @@
-import { Download } from 'lucide-react'
 import { SERVER } from '@/lib/server-info'
 
 const links = [
@@ -12,17 +11,18 @@ const links = [
 
 export function SiteHeader() {
   return (
-    <header className="fixed inset-x-0 top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-md">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-6 px-4 md:px-6">
-        <a href="#topo" className="flex items-baseline gap-2 font-serif font-bold tracking-widest">
-          <span className="text-gold text-lg">MU REBORN</span>
-          <span className="text-xs text-muted-foreground">{SERVER.version}</span>
+    <header className="fixed inset-x-0 top-0 z-50 px-4 pt-4 md:px-10 md:pt-6">
+      <div className="glass mx-auto flex h-15 max-w-7xl items-center justify-between gap-6 rounded-full pr-2 pl-6 backdrop-blur-md md:pl-8">
+        <a href="#topo" className="flex items-baseline gap-2 font-serif text-lg font-black tracking-[0.22em] md:text-xl">
+          <span className="text-chrome">MU</span>
+          <span className="text-gold">REBORN</span>
+          <span className="text-[11px] tracking-widest text-muted-foreground">{SERVER.version}</span>
         </a>
         <nav aria-label="Principal" className="hidden lg:block">
-          <ul className="flex items-center gap-6 text-sm text-muted-foreground">
+          <ul className="flex items-center gap-7 text-xs tracking-[0.16em] text-[#a9bde0] uppercase">
             {links.map((link) => (
               <li key={link.href}>
-                <a href={link.href} className="transition-colors hover:text-primary">
+                <a href={link.href} className="transition-colors hover:text-accent">
                   {link.label}
                 </a>
               </li>
@@ -33,9 +33,8 @@ export function SiteHeader() {
           href={SERVER.clientUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 rounded-sm bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+          className="btn-play h-11 shrink-0 px-5 text-xs md:px-6"
         >
-          <Download className="size-4" aria-hidden />
           Baixar cliente
         </a>
       </div>
