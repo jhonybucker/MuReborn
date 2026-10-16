@@ -1,4 +1,7 @@
-import { className } from '@/lib/mu'
+'use client'
+
+import { useRouter } from 'next/navigation'
+import { classTitle } from '@/lib/mu'
 
 export type CharacterRow = { name: string; level: number; class: number; master: boolean; resets: number }
 export type GuildRow = { name: string; master: string; members: number; score: number }
@@ -21,8 +24,8 @@ function Position({ index, podium }: { index: number; podium: boolean }) {
   return (
     <td className="py-2 pl-2 sm:py-2.5 sm:pl-2.5">
       <span
-        className={`flex size-9 items-center justify-center rounded-full border border-input bg-secondary font-serif text-lg font-black text-muted-foreground sm:size-11 ${
-          podium ? (MEDALS[index] ?? '') : ''
+        className={`flex size-9 items-center justify-center rounded-full font-serif text-lg font-black sm:size-11 ${
+          (podium && MEDALS[index]) || 'border border-input bg-secondary text-muted-foreground'
         }`}
       >
         {index + 1}
@@ -61,6 +64,7 @@ export function CharacterTable({
   podium?: boolean
   extra?: { label: string; render: (row: CharacterRow) => React.ReactNode }
 }) {
+  const router = useRouter()
   const columns = extra ? 7 : 6
   return (
     <table className={TABLE}>
@@ -68,7 +72,7 @@ export function CharacterTable({
         <tr className={HEAD}>
           <th className="w-12 sm:w-14" />
           <th className="text-left font-normal">Personagem</th>
-          <th className="hidden w-40 font-normal sm:table-cell">Classe</th>
+          <th className="hidden w-44 font-normal sm:table-cell">Classe</th>
           <th className="w-14 text-right font-normal sm:w-20">Level</th>
           <th className="w-14 text-right font-normal sm:w-20">Resets</th>
           {extra ? <th className="hidden w-36 text-right font-normal md:table-cell">{extra.label}</th> : null}
@@ -84,19 +88,24 @@ export function CharacterTable({
           <EmptyRow colSpan={columns} text={emptyText} />
         ) : (
           rows.map((r, i) => (
-            <tr key={r.name} className={rowClass(i, podium)}>
+            // A linha inteira abre o perfil; o link no nome continua para teclado e "abrir em nova aba".
+            <tr
+              key={r.name}
+              onClick={() => router.push(characterHref(r.name))}
+              className={`cursor-pointer transition-[filter] hover:brightness-125 ${rowClass(i, podium)}`}
+            >
               <Position index={i} podium={podium} />
               <td className="max-w-0 truncate pl-2 font-serif font-bold sm:text-lg">
                 <a href={characterHref(r.name)} className="hover:text-accent">
                   {r.name}
                 </a>
                 <span className="block text-[11px] font-normal tracking-[0.12em] text-muted-foreground uppercase sm:hidden">
-                  {className(r.class)}
+                  {classTitle(r.class)}
                 </span>
               </td>
               <td className="hidden text-center sm:table-cell">
-                <span className="inline-block w-36 rounded-full border border-primary/30 bg-primary/15 px-3 py-1.5 text-xs tracking-[0.12em] text-[#a9bde0] uppercase">
-                  {className(r.class)}
+                <span className="inline-block w-40 rounded-full border border-primary/30 bg-primary/15 px-3 py-1.5 text-xs tracking-[0.1em] whitespace-nowrap text-[#a9bde0] uppercase">
+                  {classTitle(r.class)}
                 </span>
               </td>
               <td className="text-right font-serif text-xl font-black text-[#8cc4ff] sm:text-2xl">{r.level}</td>

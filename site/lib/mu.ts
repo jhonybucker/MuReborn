@@ -34,6 +34,9 @@ export const className = (code: number) => CLASSES[baseIndex(code)] ?? '?'
 /** Nome da evolução (Soul Master, Blade Knight, Muse Elf) ou null se ainda não evoluiu. */
 export const classEvolution = (code: number) => ((code & 0x0f) > 0 ? (EVOLUTIONS[baseIndex(code)] ?? null) : null)
 
+/** Nome atual da classe: a evolução quando já evoluiu (Soul Master), senão a base (Dark Wizard). */
+export const classTitle = (code: number) => classEvolution(code) ?? className(code)
+
 export const classImage = (code: number) => CLASS_IMAGES[baseIndex(code)] ?? null
 
 export const isDarkLord = (code: number) => baseIndex(code) === 4

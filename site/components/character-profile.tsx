@@ -3,8 +3,9 @@
 import Image from 'next/image'
 import { Check, Share2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { type EquipmentItem, EquipmentGrid } from '@/components/equipment-grid'
 import { ApiError, api } from '@/lib/api'
-import { className, classEvolution, classImage, isDarkLord } from '@/lib/mu'
+import { className, classImage, classTitle, isDarkLord } from '@/lib/mu'
 import { SERVER } from '@/lib/server-info'
 
 // Formato de GET /api/characters/:name: docs/api-site.md. Sem mapa nem posição, de propósito.
@@ -26,6 +27,8 @@ type PublicCharacter = {
   playedHours?: number
   lastSeen?: string
   createdAt?: string
+  /** Itens equipados, já decodificados pela API. */
+  equipment?: EquipmentItem[]
 }
 
 type State =
@@ -56,7 +59,10 @@ export function CharacterProfile({ name }: { name: string }) {
   return (
     <section className="mx-auto flex min-h-svh max-w-7xl flex-col px-4 pt-32 pb-24 md:px-[72px]">
       {state.kind === 'ready' ? (
-        <Profile character={state.character} />
+        <>
+          <Profile character={state.character} />
+          <EquipmentGrid items={state.character.equipment} />
+        </>
       ) : (
         <div className="flex flex-col gap-8">
           <BackLink />
@@ -93,7 +99,6 @@ function BackLink() {
 
 function Profile({ character: c }: { character: PublicCharacter }) {
   const image = classImage(c.class)
-  const evolution = classEvolution(c.class)
   // Barra cheia = teto de atributos (o do master reset para quem já fez).
   const cap = c.master ? SERVER.masterStatCap : SERVER.statCap
   const stats = [
@@ -132,7 +137,7 @@ function Profile({ character: c }: { character: PublicCharacter }) {
           <span className="text-gold font-serif text-[32px] leading-none font-black">{c.level}</span>
         </div>
         <div className="absolute inset-x-4 bottom-7 text-center">
-          <p className="text-xs font-semibold tracking-[0.26em] text-accent uppercase">{evolution ?? className(c.class)}</p>
+          <p className="text-xs font-semibold tracking-[0.26em] text-accent uppercase">{classTitle(c.class)}</p>
           <h1 className="text-chrome mt-1.5 truncate font-serif text-[44px] leading-tight font-black">{c.name}</h1>
         </div>
       </div>
@@ -147,7 +152,7 @@ function Profile({ character: c }: { character: PublicCharacter }) {
               {c.rank} no ranking
             </Chip>
           ) : null}
-          <Chip>{className(c.class)}</Chip>
+          <Chip>{classTitle(c.class)}</Chip>
           {c.guild ? (
             <Chip>
               <span

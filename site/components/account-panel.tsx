@@ -16,7 +16,7 @@ import {
   saveSession,
 } from '@/lib/account-api'
 import { ApiError } from '@/lib/api'
-import { className, classEvolution, classImage, isDarkLord, mapName } from '@/lib/mu'
+import { classImage, classTitle, isDarkLord, mapName } from '@/lib/mu'
 
 const fmt = (n: number) => n.toLocaleString('pt-BR')
 const MAX_CHARACTERS = 5
@@ -150,7 +150,8 @@ function LoginView({
           className="flex w-full max-w-[440px] flex-col self-center rounded-[48px] border border-[rgb(130_175_255/0.32)] bg-[linear-gradient(160deg,rgb(22_50_115/0.68),rgb(5_12_32/0.94))] px-7 pt-10 pb-9 shadow-[0_40px_80px_-24px_#000,inset_0_1px_0_rgb(255_255_255/0.14)] sm:px-10"
         >
           <p className="eyebrow">Área do jogador</p>
-          <h1 className="text-chrome mt-3.5 mb-7 font-serif text-[42px] leading-[1.05] font-black">Entrar</h1>
+          <h1 className="text-chrome mt-3.5 mb-2 font-serif text-[42px] leading-[1.05] font-black">Entrar</h1>
+          <p className="mb-7 text-sm text-muted-foreground">Use o mesmo login e senha do jogo.</p>
 
           <label htmlFor="panel-login" className="mb-2 text-xs font-semibold tracking-[0.2em] text-[#a9bde0] uppercase">
             Login
@@ -345,7 +346,7 @@ function Dashboard({
                 <span className="text-[11px] tracking-[0.22em] text-muted-foreground uppercase">Maior level</span>
                 <span className="text-gold font-serif text-[44px] leading-none font-black">{top.level}</span>
                 <span className="text-[13px] text-muted-foreground">
-                  {top.name} · {className(top.class)}
+                  {top.name} · {classTitle(top.class)}
                 </span>
               </li>
             ) : null}
@@ -377,7 +378,7 @@ function CharacterCard({ character: c, highlight }: { character: Character; high
 
   return (
     <li
-      className={`glass flex flex-col gap-3.5 rounded-[36px] p-5 ${
+      className={`glass relative flex flex-col gap-3.5 rounded-[36px] p-5 transition-[filter] hover:brightness-115 ${
         highlight ? 'border-accent/55 shadow-[0_0_40px_-12px_rgb(240_180_67/0.6),0_24px_60px_-24px_#000]' : ''
       }`}
     >
@@ -392,11 +393,15 @@ function CharacterCard({ character: c, highlight }: { character: Character; high
           />
         ) : null}
         <div className="min-w-0">
-          <a href={characterHref(c.name)} className="block truncate font-serif text-[22px] leading-tight font-black hover:text-accent">
+          {/* O link cobre o card inteiro (after:inset-0); só o "Ver atributos" fica por cima. */}
+          <a
+            href={characterHref(c.name)}
+            className="block truncate font-serif text-[22px] leading-tight font-black after:absolute after:inset-0 after:rounded-[36px] after:content-[''] hover:text-accent"
+          >
             {c.name}
           </a>
           <p className="mt-1 text-xs tracking-[0.14em] text-muted-foreground uppercase">
-            {classEvolution(c.class) ?? className(c.class)}
+            {classTitle(c.class)}
           </p>
         </div>
         <span className="ml-auto flex shrink-0 items-center gap-1.5 text-[11px] tracking-[0.14em] text-muted-foreground uppercase">
@@ -444,7 +449,7 @@ function CharacterCard({ character: c, highlight }: { character: Character; high
         {c.guild ?? 'Sem guilda'}
       </p>
 
-      <details className="group">
+      <details className="group relative z-10">
         <summary className="flex cursor-pointer list-none items-center gap-2 text-xs tracking-[0.14em] text-[#8cc4ff] uppercase [&::-webkit-details-marker]:hidden">
           Ver atributos e local
           <span className="transition-transform group-open:rotate-180" aria-hidden>
