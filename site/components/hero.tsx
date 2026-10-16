@@ -14,7 +14,7 @@ export function Hero() {
   return (
     <section id="topo" className="relative isolate flex min-h-svh flex-col overflow-hidden pt-28 pb-10 md:pb-12">
       <Image
-        src="/fundo.png"
+        src="/fundo.webp"
         alt=""
         fill
         priority
@@ -27,7 +27,7 @@ export function Hero() {
         <div className="animate-rise flex max-w-xl flex-col items-center text-center md:items-start md:text-left">
           <h1>
             <Image
-              src="/logo.png"
+              src="/logo.webp"
               alt="MU Reborn"
               width={612}
               height={408}

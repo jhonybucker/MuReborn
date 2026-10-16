@@ -7,11 +7,24 @@ import './globals.css'
 const cinzel = Cinzel({ subsets: ['latin'], variable: '--font-cinzel', weight: ['500', '700', '900'] })
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 
+const title = 'MU Reborn 99b — Servidor Hard com Reset Acumulativo'
+const description =
+  'MU Reborn: servidor privado de MU Online versão 99b, estilo hard, com reset acumulativo e master reset. Baixe o cliente, configure e entre na batalha.'
+
 export const metadata: Metadata = {
-  title: 'MU Reborn 99b — Servidor Hard com Reset Acumulativo',
-  description:
-    'MU Reborn: servidor privado de MU Online versão 99b, estilo hard, com reset acumulativo e master reset. Baixe o cliente, configure e entre na batalha.',
-  generator: 'v0.app',
+  // A prévia de links (WhatsApp, Discord) precisa do endereço completo da imagem.
+  // No Netlify, URL é preenchida no build com o domínio principal do site.
+  metadataBase: new URL(process.env.URL ?? 'http://localhost:3000'),
+  title,
+  description,
+  openGraph: {
+    type: 'website',
+    locale: 'pt_BR',
+    siteName: 'MU Reborn',
+    title,
+    description,
+  },
+  twitter: { card: 'summary_large_image', title, description },
   icons: {
     icon: [
       { url: '/favicon.ico', sizes: 'any' },
@@ -37,7 +50,7 @@ export default function RootLayout({
       <body className="antialiased">
         {/* Fundo fixo da página inteira, escurecido para o texto das seções continuar legível. */}
         <div className="fixed inset-0 -z-10" aria-hidden>
-          <Image src="/fundo.png" alt="" fill sizes="100vw" className="object-cover object-[60%_50%]" />
+          <Image src="/fundo.webp" alt="" fill sizes="100vw" className="object-cover object-[60%_50%]" />
           <div className="absolute inset-0 bg-[rgb(4_9_22/0.86)]" />
         </div>
         {children}

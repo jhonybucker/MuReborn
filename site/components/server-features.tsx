@@ -42,7 +42,7 @@ export function ServerFeatures() {
       <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-24 sm:gap-6 md:px-[72px] lg:flex-row">
         <div className="gold-ring relative min-h-[300px] shrink-0 overflow-hidden rounded-t-[150px] rounded-b-[32px] sm:min-h-[420px] sm:rounded-t-[200px] sm:rounded-b-[40px] lg:w-[470px]">
           <Image
-            src="/fundo.png"
+            src="/fundo.webp"
             alt=""
             fill
             sizes="(min-width: 1024px) 470px, 100vw"

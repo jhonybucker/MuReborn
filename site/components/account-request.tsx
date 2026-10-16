@@ -59,7 +59,7 @@ export function AccountRequest() {
       <div className="mx-auto flex max-w-7xl flex-col items-center gap-12 px-4 py-24 md:px-20 lg:flex-row lg:gap-[72px]">
         <div className="gold-ring relative hidden h-[608px] w-[410px] shrink-0 overflow-hidden rounded-t-[205px] rounded-b-[44px] lg:block">
           <Image
-            src="/fundo.png"
+            src="/fundo.webp"
             alt=""
             fill
             sizes="410px"
@@ -67,7 +67,7 @@ export function AccountRequest() {
           />
           <div className="absolute inset-0 bg-[linear-gradient(0deg,#040916_6%,rgb(4_9_22/0.2)_50%,transparent_80%)]" />
           <Image
-            src="/logo.png"
+            src="/logo.webp"
             alt=""
             width={612}
             height={408}
