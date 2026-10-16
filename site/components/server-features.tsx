@@ -39,8 +39,8 @@ export function ServerFeatures() {
       id="servidor"
       className="bg-[radial-gradient(ellipse_60%_70%_at_0%_0%,rgb(61_139_255/0.2),transparent_70%)]"
     >
-      <div className="mx-auto flex max-w-7xl flex-col gap-6 px-4 py-24 md:px-[72px] lg:flex-row">
-        <div className="gold-ring relative min-h-[420px] shrink-0 overflow-hidden rounded-t-[200px] rounded-b-[40px] lg:w-[470px]">
+      <div className="mx-auto flex max-w-7xl flex-col gap-4 px-4 py-24 sm:gap-6 md:px-[72px] lg:flex-row">
+        <div className="gold-ring relative min-h-[300px] shrink-0 overflow-hidden rounded-t-[150px] rounded-b-[32px] sm:min-h-[420px] sm:rounded-t-[200px] sm:rounded-b-[40px] lg:w-[470px]">
           <Image
             src="/fundo.png"
             alt=""
@@ -49,9 +49,9 @@ export function ServerFeatures() {
             className="object-cover object-[64%_50%]"
           />
           <div className="absolute inset-0 bg-[linear-gradient(0deg,#040916_8%,rgb(4_9_22/0.55)_45%,transparent_75%)]" />
-          <div className="absolute inset-x-9 bottom-9">
+          <div className="absolute inset-x-6 bottom-6 sm:inset-x-9 sm:bottom-9">
             <p className="eyebrow">O servidor</p>
-            <h2 className="text-chrome mt-3.5 font-serif text-4xl leading-[1.08] font-black md:text-[44px]">
+            <h2 className="text-chrome mt-3 font-serif text-[32px] leading-[1.08] font-black sm:mt-3.5 sm:text-4xl md:text-[44px]">
               Hard de verdade.
               <br />
               Sem pressa,
@@ -61,21 +61,21 @@ export function ServerFeatures() {
           </div>
         </div>
 
-        <ul className="grid flex-1 gap-6 sm:grid-cols-2">
+        <ul className="grid flex-1 grid-cols-2 gap-3 sm:gap-6">
           {features.map(({ icon: Icon, stat, statClass, title, text }) => (
             <li
               key={title}
-              className="glass flex min-h-[260px] flex-col justify-between gap-6 rounded-[40px] bg-[linear-gradient(160deg,rgb(20_44_100/0.6),rgb(5_12_32/0.9))] px-8 py-7"
+              className="glass flex flex-col justify-between gap-4 rounded-[28px] bg-[linear-gradient(160deg,rgb(20_44_100/0.6),rgb(5_12_32/0.9))] p-4 sm:min-h-[260px] sm:gap-6 sm:rounded-[40px] sm:px-8 sm:py-7"
             >
               <div className="flex items-start justify-between">
-                <span className={`font-serif text-7xl leading-none font-black ${statClass}`}>{stat}</span>
-                <span className="flex size-13 items-center justify-center rounded-full border border-[rgb(140_196_255/0.45)] bg-primary/15 text-[#bfe0ff] shadow-[0_0_22px_-4px_var(--primary)]">
-                  <Icon className="size-6" strokeWidth={1.8} aria-hidden />
+                <span className={`font-serif text-[40px] leading-none font-black sm:text-7xl ${statClass}`}>{stat}</span>
+                <span className="flex size-9 shrink-0 items-center justify-center rounded-full sm:size-13 border border-[rgb(140_196_255/0.45)] bg-primary/15 text-[#bfe0ff] shadow-[0_0_22px_-4px_var(--primary)]">
+                  <Icon className="size-4 sm:size-6" strokeWidth={1.8} aria-hidden />
                 </span>
               </div>
               <div>
-                <h3 className="mb-2 font-serif text-[22px] font-bold">{title}</h3>
-                <p className="leading-relaxed text-[#9db2d9]">{text}</p>
+                <h3 className="mb-1.5 font-serif text-[15px] leading-tight font-bold sm:mb-2 sm:text-[22px]">{title}</h3>
+                <p className="text-[13px] leading-snug text-[#9db2d9] sm:text-base sm:leading-relaxed">{text}</p>
               </div>
             </li>
           ))}
