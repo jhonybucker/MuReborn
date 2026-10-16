@@ -16,7 +16,7 @@ const MEDALS = [
 const rowClass = (index: number, podium: boolean) =>
   `[&>td]:border-y [&>td]:bg-[rgb(12_28_66/0.7)] [&>td:first-child]:rounded-l-full [&>td:first-child]:border-l [&>td:last-child]:rounded-r-full [&>td:last-child]:border-r ${
     podium && index === 0
-      ? '[&>td]:border-accent/60 shadow-[0_0_36px_-10px_var(--accent)]'
+      ? '[&>td]:border-accent/60 drop-shadow-[0_0_14px_rgb(240_180_67/0.35)]'
       : '[&>td]:border-[rgb(130_175_255/0.26)]'
   }`
 

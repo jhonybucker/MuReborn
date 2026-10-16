@@ -1,6 +1,6 @@
 'use client'
 
-import { CalendarClock, Castle, type LucideIcon, Skull, Swords } from 'lucide-react'
+import { CalendarClock, Castle, Flame, type LucideIcon, Skull, Swords } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { api } from '@/lib/api'
 import { useNow } from '@/lib/use-now'
@@ -35,6 +35,11 @@ const KNOWN: Record<string, { icon: LucideIcon; description: string }> = {
   'devil-square': { icon: Skull, description: 'Arena de combate contra hordas de monstros.' },
   'chaos-castle': { icon: Swords, description: 'Batalha de sobrevivência: só o último de pé vence.' },
 }
+
+// Invasões chegam como invasion-0, invasion-1… (Skeleton King, Red Dragon, Dourados, White Wizard).
+const INVASION = { icon: Flame, description: 'Invasão de monstros pelos mapas. Junte-se para derrotar o chefe.' }
+
+const knownEvent = (id: string) => KNOWN[id] ?? (id.startsWith('invasion') ? INVASION : undefined)
 
 type State = { kind: 'loading' } | { kind: 'error' } | { kind: 'ready'; events: GameEvent[]; offset: number }
 
@@ -71,7 +76,7 @@ export function useEvents() {
       ? state.events
           .map((event) => {
             const start = new Date(event.next).getTime()
-            const known = KNOWN[event.id]
+            const known = knownEvent(event.id)
             return {
               ...event,
               start,
