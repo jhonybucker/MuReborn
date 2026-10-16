@@ -18,7 +18,7 @@ Formato comum:
 | `GET /rankings/guilds` | **nova** | `/ranking`, aba Guilds |
 | `GET /online` | **nova** | `/ranking`, aba Online agora |
 | `GET /characters/:name` | **nova** | `/personagem/:nome` |
-| `GET /events` | **nova** | Notícias e eventos (home) |
+| `GET /events` | **nova** | Notícias e eventos (home) e `/eventos` |
 | `POST /login` | **nova** | `/painel` |
 | `GET /me/characters` | **nova** | `/painel` |
 | `POST /me/password` | **nova** | `/painel`, Trocar senha |
@@ -121,7 +121,9 @@ Próximo horário de cada evento, calculado pelo servidor a partir da agenda do 
       "next": "2026-10-16T22:00:00-03:00",
       "entryMinutes": 5,
       "schedule": "A cada 2 horas",
-      "map": "Blood Castle 1 a 7"
+      "map": "Blood Castle 1 a 7",
+      "description": "Invasão ao castelo em party, com tempo limite.",
+      "today": ["2026-10-16T00:00:00-03:00", "2026-10-16T02:00:00-03:00", "…", "2026-10-16T22:00:00-03:00"]
     }
   ]
 }
@@ -133,6 +135,11 @@ Próximo horário de cada evento, calculado pelo servidor a partir da agenda do 
   mande o início atual (o site mostra "Acontecendo agora" enquanto `now` < `next` + `entryMinutes`).
 - `entryMinutes`: por quantos minutos a entrada fica aberta depois do início.
 - `schedule` e `map`: texto livre e opcional, mostrado abaixo do nome.
+- `id`: identificador estável. Para `blood-castle`, `devil-square` e `chaos-castle` o site já tem
+  ícone e descrição próprios; outros ids aparecem com um ícone genérico.
+- `description` (opcional): substitui a descrição padrão do site.
+- `today` (opcional): todos os inícios do dia de hoje, para a linha do tempo de `/eventos`.
+  Sem ele, a linha do tempo marca só o próximo início.
 - Os horários vêm da configuração dos eventos no servidor do jogo (Blood Castle, Devil Square,
   Chaos Castle, invasões). O site atualiza a lista a cada 5 minutos.
 

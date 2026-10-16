@@ -186,8 +186,28 @@
   animation: rise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
 }
 
+/* Faíscas que sobem devagar (páginas de erro). */
+@keyframes ember {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-180px);
+    opacity: 0;
+  }
+}
+
+@utility animate-ember {
+  animation: ember 6s ease-in infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .animate-rise {
+  .animate-rise,
+  .animate-ember {
     animation: none;
   }
 }

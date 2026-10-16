@@ -9,9 +9,9 @@ const links = [
   { href: '/#servidor', label: 'Servidor' },
   { href: '/#classes', label: 'Classes' },
   { href: '/#noticias', label: 'Notícias' },
+  { href: '/eventos', label: 'Eventos' },
   { href: '/ranking', label: 'Ranking' },
   { href: '/downloads', label: 'Downloads' },
-  { href: '/#comecar', label: 'Como jogar' },
   { href: '/#regras', label: 'Regras' },
 ]
 
