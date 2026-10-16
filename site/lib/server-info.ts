@@ -3,6 +3,9 @@ export const SERVER = {
   version: '99b',
   ip: '102.165.46.30',
   clientUrl: 'https://mega.nz/file/dVd2mKJB#6gM2NJERj88DxibQ__qNhlBvcmL1vF5T_PkX5Xlujds',
+  clientSizeMb: 134,
+  // Convite do Discord (ex.: 'https://discord.gg/xxxx'). Vazio = botão escondido.
+  discordUrl: '' as string,
   rates: {
     exp: '1000%',
     drop: '50%',

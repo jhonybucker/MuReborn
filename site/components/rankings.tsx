@@ -1,39 +1,28 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { type CharacterRow, CharacterTable } from '@/components/ranking-table'
 import { SectionHeading } from '@/components/section-heading'
-import { className } from '@/lib/mu'
-import { SERVER } from '@/lib/server-info'
+import { api } from '@/lib/api'
 
-// Ouro, prata e bronze para o pódio.
-const MEDALS = [
-  'bg-gradient-to-b from-[#fff3c4] to-[#c9780f] text-[#2a1700] border-0',
-  'bg-gradient-to-b from-[#f2f6ff] to-[#8d9dbb] text-[#0b1330] border-0',
-  'bg-gradient-to-b from-[#f0b07a] to-[#8a4a1c] text-[#1f0e02] border-0',
-]
-
-type Row = { name: string; level: number; class: number; master: boolean; resets: number }
-
-// Sem resposta da API em 10s, mostra indisponível em vez de ficar carregando para sempre.
-const getJson = (path: string) =>
-  fetch(SERVER.apiBase + path, { signal: AbortSignal.timeout(10000) }).then((x) => {
-    if (!x.ok) throw new Error(String(x.status))
-    return x.json()
-  })
+type Status = { online: number; ports?: Record<string, boolean> }
 
 export function Rankings() {
   const [online, setOnline] = useState<number | null>(null)
-  const [rows, setRows] = useState<Row[]>([])
+  const [rows, setRows] = useState<CharacterRow[]>([])
   const [serversUp, setServersUp] = useState<boolean | null>(null)
   const [apiDown, setApiDown] = useState(false)
 
   useEffect(() => {
     let alive = true
     async function load() {
-      const [s, r] = await Promise.allSettled([getJson('/status'), getJson('/rankings')])
+      const [s, r] = await Promise.allSettled([
+        api<Status>('/status'),
+        api<{ rankings?: CharacterRow[] }>('/rankings?limit=10'),
+      ])
       if (!alive) return
-      const status = s.status === 'fulfilled' && s.value?.ok ? s.value : null
-      const ranking = r.status === 'fulfilled' && r.value?.ok ? r.value : null
+      const status = s.status === 'fulfilled' ? s.value : null
+      const ranking = r.status === 'fulfilled' ? r.value : null
       if (status) {
         setOnline(status.online)
         setServersUp([44405, 55901, 55960, 55970].every((p) => status.ports?.[String(p)]))
@@ -90,68 +79,13 @@ export function Rankings() {
         </div>
 
         <div className="flex min-w-0 flex-1 flex-col justify-center overflow-x-auto">
-          <table className="w-full border-separate border-spacing-y-2.5">
-            <thead>
-              <tr className="text-[11px] tracking-[0.22em] text-[#6f86b3] uppercase">
-                <th className="w-12 sm:w-14" />
-                <th className="text-left font-normal">Personagem</th>
-                <th className="hidden w-40 font-normal sm:table-cell">Classe</th>
-                <th className="w-14 text-right font-normal sm:w-20">Level</th>
-                <th className="w-14 text-right font-normal sm:w-20">Resets</th>
-                <th className="w-10 pr-4 font-normal sm:w-12 sm:pr-7">
-                  <abbr title="Master reset" className="no-underline">
-                    M
-                  </abbr>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="glass rounded-full px-7 py-5 text-center text-muted-foreground">
-                    {apiDown ? 'Ranking indisponível no momento. Tente novamente mais tarde.' : 'Carregando ranking…'}
-                  </td>
-                </tr>
-              ) : (
-                rows.map((r, i) => (
-                  <tr
-                    key={r.name}
-                    className={`[&>td]:border-y [&>td]:bg-[rgb(12_28_66/0.7)] [&>td:first-child]:rounded-l-full [&>td:first-child]:border-l [&>td:last-child]:rounded-r-full [&>td:last-child]:border-r ${
-                      i === 0
-                        ? '[&>td]:border-accent/60 shadow-[0_0_36px_-10px_var(--accent)]'
-                        : '[&>td]:border-[rgb(130_175_255/0.26)]'
-                    }`}
-                  >
-                    <td className="py-2 pl-2 sm:py-2.5 sm:pl-2.5">
-                      <span
-                        className={`flex size-9 items-center justify-center rounded-full sm:size-11 border border-input bg-secondary font-serif text-lg font-black text-muted-foreground ${
-                          MEDALS[i] ?? ''
-                        }`}
-                      >
-                        {i + 1}
-                      </span>
-                    </td>
-                    <td className="max-w-0 truncate pl-2 font-serif font-bold sm:text-lg">
-                      {r.name}
-                      <span className="block text-[11px] font-normal tracking-[0.12em] text-muted-foreground uppercase sm:hidden">
-                        {className(r.class)}
-                      </span>
-                    </td>
-                    <td className="hidden text-center sm:table-cell">
-                      <span className="inline-block w-36 rounded-full border border-primary/30 bg-primary/15 px-3 py-1.5 text-xs tracking-[0.12em] text-[#a9bde0] uppercase">
-                        {className(r.class)}
-                      </span>
-                    </td>
-                    <td className="text-right font-serif text-xl font-black text-[#8cc4ff] sm:text-2xl">{r.level}</td>
-                    <td className="text-right text-muted-foreground">↺ {r.resets}</td>
-                    <td className="pr-4 text-center text-xl text-accent sm:pr-7">
-                      {r.master ? <span aria-label="Master reset">★</span> : null}
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+          <CharacterTable
+            rows={rows}
+            emptyText={apiDown ? 'Ranking indisponível no momento. Tente novamente mais tarde.' : 'Carregando ranking…'}
+          />
+          <a href="/ranking" className="btn-frame mt-4 h-11 self-center px-6 text-xs">
+            Ver ranking completo
+          </a>
         </div>
       </div>
     </section>

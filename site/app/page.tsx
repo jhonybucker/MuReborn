@@ -2,6 +2,7 @@ import { AccountRequest } from '@/components/account-request'
 import { Classes } from '@/components/classes'
 import { Hero } from '@/components/hero'
 import { HowToPlay } from '@/components/how-to-play'
+import { NewsEvents } from '@/components/news-events'
 import { Rankings } from '@/components/rankings'
 import { ResetSystem } from '@/components/reset-system'
 import { Rules, SiteFooter } from '@/components/rules-footer'
@@ -14,6 +15,7 @@ export default function Page() {
       <SiteHeader />
       <main>
         <Hero />
+        <NewsEvents />
         <Rankings />
         <ServerFeatures />
         <ResetSystem />

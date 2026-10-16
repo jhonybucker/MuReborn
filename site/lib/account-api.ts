@@ -1,6 +1,4 @@
-import { SERVER } from '@/lib/server-info'
-
-// Rotas descritas em docs/api-login-personagens.md (implementadas na API da VPS).
+import { ApiError, api } from '@/lib/api'
 
 export type Character = {
   name: string
@@ -23,15 +21,6 @@ export type Character = {
 
 export type Session = { token: string; login: string }
 
-export class AccountApiError extends Error {
-  constructor(
-    public kind: 'credentials' | 'expired' | 'rate-limit' | 'network' | 'server',
-    message: string,
-  ) {
-    super(message)
-  }
-}
-
 const TOKEN_KEY = 'mu-reborn-session'
 
 // sessionStorage: a sessão some ao fechar o navegador. Pode falhar em aba anônima, então tudo em try/catch.
@@ -53,45 +42,36 @@ export function saveSession(session: Session | null) {
   }
 }
 
-async function request(path: string, init: RequestInit = {}) {
-  let res: Response
-  try {
-    res = await fetch(SERVER.apiBase + path, { ...init, signal: AbortSignal.timeout(10000) })
-  } catch {
-    throw new AccountApiError('network', 'Não foi possível conectar ao servidor. Tente novamente mais tarde.')
-  }
-  const body = (await res.json().catch(() => null)) as { ok?: boolean; error?: string } | null
-  if (res.status === 429) throw new AccountApiError('rate-limit', 'Muitas tentativas. Aguarde alguns minutos.')
-  if (!res.ok || !body?.ok) {
-    throw new AccountApiError('server', body?.error ?? 'Erro no servidor. Tente novamente mais tarde.')
-  }
-  return body as Record<string, unknown>
-}
-
 export async function login(user: string, password: string): Promise<Session> {
   try {
-    const body = await request('/login', {
+    const body = await api<{ token: string; login?: string }>('/login', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ login: user, password }),
+      body: { login: user, password },
     })
-    return { token: String(body.token), login: String(body.login ?? user) }
+    return { token: body.token, login: body.login ?? user }
   } catch (err) {
-    // A rota responde 401 para login ou senha errados; não diferenciamos para não revelar se a conta existe.
-    if (err instanceof AccountApiError && err.kind === 'server' && err.message === 'invalid_credentials') {
-      throw new AccountApiError('credentials', 'Login ou senha incorretos.')
+    // A API responde 401 tanto para login inexistente quanto para senha errada.
+    if (err instanceof ApiError && err.kind === 'unauthorized') {
+      throw new ApiError('unauthorized', err.code, 'Login ou senha incorretos.')
     }
     throw err
   }
 }
 
 export async function fetchCharacters(session: Session): Promise<Character[]> {
+  const body = await api<{ characters?: Character[] }>('/me/characters', { token: session.token })
+  return body.characters ?? []
+}
+
+export async function changePassword(session: Session, currentPassword: string, newPassword: string) {
   try {
-    const body = await request('/me/characters', { headers: { Authorization: `Bearer ${session.token}` } })
-    return (body.characters as Character[]) ?? []
+    await api('/me/password', { method: 'POST', token: session.token, body: { currentPassword, newPassword } })
   } catch (err) {
-    if (err instanceof AccountApiError && err.kind === 'server' && err.message === 'unauthorized') {
-      throw new AccountApiError('expired', 'Sua sessão expirou. Entre novamente.')
+    if (err instanceof ApiError && err.code === 'invalid_credentials') {
+      throw new ApiError('server', err.code, 'A senha atual está incorreta.')
+    }
+    if (err instanceof ApiError && err.code === 'invalid_password') {
+      throw new ApiError('server', err.code, 'A nova senha precisa ter de 4 a 10 caracteres, sem espaços.')
     }
     throw err
   }
@@ -99,5 +79,5 @@ export async function fetchCharacters(session: Session): Promise<Character[]> {
 
 export async function logout(session: Session) {
   // Melhor esforço: mesmo se a API falhar, a sessão local é descartada.
-  await request('/logout', { method: 'POST', headers: { Authorization: `Bearer ${session.token}` } }).catch(() => {})
+  await api('/logout', { method: 'POST', token: session.token }).catch(() => {})
 }

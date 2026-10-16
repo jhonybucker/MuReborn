@@ -1,19 +1,20 @@
 'use client'
 
 import Image from 'next/image'
-import { Coins, Lock, LogOut, MapPin, User } from 'lucide-react'
+import { Coins, KeyRound, Lock, LogOut, MapPin, User } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { SectionHeading } from '@/components/section-heading'
 import {
-  AccountApiError,
   type Character,
   type Session,
+  changePassword,
   fetchCharacters,
   loadSession,
   login,
   logout,
   saveSession,
 } from '@/lib/account-api'
+import { ApiError } from '@/lib/api'
 import { className, classEvolution, classImage, isDarkLord, mapName } from '@/lib/mu'
 
 const fmt = (n: number) => n.toLocaleString('pt-BR')
@@ -32,7 +33,7 @@ export function AccountPanel() {
       const characters = await fetchCharacters(session)
       setView({ kind: 'characters', session, characters, error: null })
     } catch (err) {
-      if (err instanceof AccountApiError && err.kind === 'expired') {
+      if (err instanceof ApiError && err.kind === 'unauthorized') {
         saveSession(null)
         setView({ kind: 'login', busy: false, error: err.message })
         return
@@ -64,6 +65,11 @@ export function AccountPanel() {
     } catch (err) {
       setView({ kind: 'login', busy: false, error: (err as Error).message })
     }
+  }
+
+  const expireSession = () => {
+    saveSession(null)
+    setView({ kind: 'login', busy: false, error: 'Sua sessão expirou. Entre novamente.' })
   }
 
   async function handleLogout(session: Session) {
@@ -118,6 +124,8 @@ export function AccountPanel() {
               ))}
             </ul>
           )}
+
+          <PasswordForm session={view.session} onExpired={expireSession} />
         </div>
       )}
     </section>
@@ -246,7 +254,9 @@ function CharacterCard({ character: c }: { character: Character }) {
             {evolution ?? className(c.class)}
           </p>
           <h3 className="flex items-center gap-2 font-serif text-2xl font-black">
-            {c.name}
+            <a href={`/personagem/${encodeURIComponent(c.name)}`} className="hover:text-accent">
+              {c.name}
+            </a>
             {c.master ? (
               <span className="text-lg text-accent" title="Master reset">
                 ★<span className="sr-only">Master reset</span>
@@ -304,5 +314,99 @@ function CharacterCard({ character: c }: { character: Character }) {
         </dl>
       </div>
     </li>
+  )
+}
+
+function PasswordForm({ session, onExpired }: { session: Session; onExpired: () => void }) {
+  const [status, setStatus] = useState<
+    { kind: 'idle' } | { kind: 'busy' } | { kind: 'done' } | { kind: 'error'; message: string }
+  >({ kind: 'idle' })
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    const form = event.currentTarget
+    const data = new FormData(form)
+    const current = String(data.get('current') ?? '')
+    const next = String(data.get('next') ?? '')
+    const confirm = String(data.get('confirm') ?? '')
+
+    if (next.length < 4 || next.length > 10 || /\s/.test(next)) {
+      setStatus({ kind: 'error', message: 'A nova senha precisa ter de 4 a 10 caracteres, sem espaços.' })
+      return
+    }
+    if (next !== confirm) {
+      setStatus({ kind: 'error', message: 'A confirmação não é igual à nova senha.' })
+      return
+    }
+
+    setStatus({ kind: 'busy' })
+    try {
+      await changePassword(session, current, next)
+      form.reset()
+      setStatus({ kind: 'done' })
+    } catch (err) {
+      if (err instanceof ApiError && err.kind === 'unauthorized') {
+        onExpired()
+        return
+      }
+      setStatus({ kind: 'error', message: (err as Error).message })
+    }
+  }
+
+  const fields = [
+    { name: 'current', label: 'Senha atual', autoComplete: 'current-password' },
+    { name: 'next', label: 'Nova senha', autoComplete: 'new-password' },
+    { name: 'confirm', label: 'Confirmar nova senha', autoComplete: 'new-password' },
+  ]
+
+  return (
+    <details className="glass group rounded-[32px] bg-[linear-gradient(160deg,rgb(20_44_100/0.5),rgb(5_12_32/0.85))]">
+      <summary className="flex cursor-pointer list-none items-center gap-3 px-7 py-5 font-serif text-lg font-bold [&::-webkit-details-marker]:hidden">
+        <KeyRound className="size-5 text-accent" aria-hidden />
+        Trocar senha
+        <span className="ml-auto text-muted-foreground transition-transform group-open:rotate-180" aria-hidden>
+          ▾
+        </span>
+      </summary>
+      <form onSubmit={handleSubmit} noValidate className="grid gap-4 px-7 pb-7 md:grid-cols-3 md:items-end">
+        {fields.map((field) => (
+          <div key={field.name} className="flex flex-col gap-2">
+            <label
+              htmlFor={`pw-${field.name}`}
+              className="text-xs font-semibold tracking-[0.2em] text-[#a9bde0] uppercase"
+            >
+              {field.label}
+            </label>
+            <input
+              id={`pw-${field.name}`}
+              name={field.name}
+              type="password"
+              required
+              maxLength={10}
+              autoComplete={field.autoComplete}
+              className="h-12 rounded-full border border-[#2a4c94] bg-[rgb(4_9_22/0.75)] px-5 text-foreground focus:border-ring focus:outline-none"
+            />
+          </div>
+        ))}
+        <p className="text-[13px] text-[#6f86b3] md:col-span-2">
+          4 a 10 caracteres, sem espaços. A senha nova vale para o site e para o jogo.
+        </p>
+        <button type="submit" disabled={status.kind === 'busy'} className="btn-play h-12 text-sm">
+          {status.kind === 'busy' ? 'Salvando...' : 'Salvar nova senha'}
+        </button>
+        {status.kind === 'error' ? (
+          <p
+            role="alert"
+            className="rounded-full border border-destructive/60 bg-destructive/15 px-6 py-3 text-sm text-red-200 md:col-span-3"
+          >
+            {status.message}
+          </p>
+        ) : status.kind === 'done' ? (
+          <p role="status" className="rounded-full border border-[#37e08a]/50 bg-[#37e08a]/10 px-6 py-3 text-sm text-[#a6f5c9] md:col-span-3">
+            Senha alterada. Use a nova senha no próximo login do jogo.
+          </p>
+        ) : null}
+      </form>
+    </details>
   )
 }

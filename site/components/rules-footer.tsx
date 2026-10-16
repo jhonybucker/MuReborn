@@ -1,3 +1,4 @@
+import { DiscordLink } from '@/components/discord-link'
 import { SectionHeading } from '@/components/section-heading'
 import { SERVER } from '@/lib/server-info'
 
@@ -70,12 +71,36 @@ export function Rules() {
 export function SiteFooter() {
   return (
     <footer className="px-4 pb-7 md:px-10">
-      <div className="glass mx-auto flex max-w-7xl flex-col items-center justify-between gap-3 rounded-[36px] px-10 py-6 text-center text-[13px] text-muted-foreground md:h-[72px] md:flex-row md:rounded-full md:py-0 md:text-left">
+      <div className="glass mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 rounded-[36px] px-8 py-6 text-center text-[13px] text-muted-foreground lg:flex-row lg:rounded-full lg:px-10 lg:text-left">
         <p className="font-serif text-lg font-black tracking-[0.22em]">
           <span className="text-chrome">MU</span> <span className="text-gold">REBORN</span>{' '}
           <span className="text-[11px] text-muted-foreground">{SERVER.version}</span>
         </p>
-        <p className="text-pretty">Servidor privado sem fins lucrativos. MU Online é marca registrada da Webzen.</p>
+        <nav aria-label="Rodapé">
+          <ul className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-xs tracking-[0.14em] uppercase">
+            <li>
+              <a href="/ranking" className="hover:text-accent">
+                Ranking
+              </a>
+            </li>
+            <li>
+              <a href="/downloads" className="hover:text-accent">
+                Downloads
+              </a>
+            </li>
+            <li>
+              <a href="/painel" className="hover:text-accent">
+                Minha conta
+              </a>
+            </li>
+            {SERVER.discordUrl ? (
+              <li>
+                <DiscordLink variant="icon" className="size-9" />
+              </li>
+            ) : null}
+          </ul>
+        </nav>
+        <p className="max-w-sm text-pretty">Servidor privado sem fins lucrativos. MU Online é marca registrada da Webzen.</p>
       </div>
     </footer>
   )

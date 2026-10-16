@@ -2,14 +2,16 @@
 
 import { Download, Menu, UserRound, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { DiscordLink } from '@/components/discord-link'
 import { SERVER } from '@/lib/server-info'
 
 const links = [
   { href: '/#servidor', label: 'Servidor' },
-  { href: '/#reset', label: 'Reset' },
   { href: '/#classes', label: 'Classes' },
+  { href: '/#noticias', label: 'Notícias' },
+  { href: '/ranking', label: 'Ranking' },
+  { href: '/downloads', label: 'Downloads' },
   { href: '/#comecar', label: 'Como jogar' },
-  { href: '/#conta', label: 'Conta' },
   { href: '/#regras', label: 'Regras' },
 ]
 
@@ -20,7 +22,7 @@ export function SiteHeader() {
   useEffect(() => {
     if (!open) return
     const onKey = (event: KeyboardEvent) => event.key === 'Escape' && setOpen(false)
-    const desktop = window.matchMedia('(min-width: 1024px)')
+    const desktop = window.matchMedia('(min-width: 1280px)')
     const onResize = () => desktop.matches && setOpen(false)
     window.addEventListener('keydown', onKey)
     desktop.addEventListener('change', onResize)
@@ -45,8 +47,8 @@ export function SiteHeader() {
           <span className="text-[11px] tracking-widest text-muted-foreground">{SERVER.version}</span>
         </a>
 
-        <nav aria-label="Principal" className="hidden lg:block">
-          <ul className="flex items-center gap-7 text-xs tracking-[0.16em] text-[#a9bde0] uppercase">
+        <nav aria-label="Principal" className="hidden xl:block">
+          <ul className="flex items-center gap-6 text-xs tracking-[0.16em] text-[#a9bde0] uppercase">
             {links.map((link) => (
               <li key={link.href}>
                 <a href={link.href} className="transition-colors hover:text-accent">
@@ -58,6 +60,7 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex shrink-0 items-center gap-2">
+          <DiscordLink variant="icon" className="hidden sm:flex" />
           <span className="hidden sm:contents">
             <a href="/painel" className="btn-frame h-11 px-4 text-xs md:px-5">
               <UserRound className="size-4" aria-hidden />
@@ -78,7 +81,7 @@ export function SiteHeader() {
             aria-expanded={open}
             aria-controls="menu-mobile"
             aria-label={open ? 'Fechar menu' : 'Abrir menu'}
-            className="flex size-11 items-center justify-center rounded-full border border-[rgb(130_175_255/0.35)] bg-[rgb(4_9_22/0.55)] text-foreground transition-colors hover:border-accent hover:text-accent lg:hidden"
+            className="flex size-11 items-center justify-center rounded-full border border-[rgb(130_175_255/0.35)] bg-[rgb(4_9_22/0.55)] text-foreground transition-colors hover:border-accent hover:text-accent xl:hidden"
           >
             {open ? <X className="size-5" aria-hidden /> : <Menu className="size-5" aria-hidden />}
           </button>
@@ -92,12 +95,12 @@ export function SiteHeader() {
             aria-label="Fechar menu"
             tabIndex={-1}
             onClick={close}
-            className="fixed inset-0 -z-10 bg-[rgb(4_9_22/0.6)] backdrop-blur-[2px] lg:hidden"
+            className="fixed inset-0 -z-10 bg-[rgb(4_9_22/0.6)] backdrop-blur-[2px] xl:hidden"
           />
           <nav
             id="menu-mobile"
             aria-label="Menu"
-            className="glass animate-rise mx-auto mt-3 max-w-7xl rounded-[32px] p-3 backdrop-blur-md lg:hidden"
+            className="glass animate-rise mx-auto mt-3 max-w-7xl rounded-[32px] p-3 backdrop-blur-md xl:hidden"
           >
             <ul className="flex flex-col">
               {links.map((link) => (
@@ -113,6 +116,7 @@ export function SiteHeader() {
                 </li>
               ))}
             </ul>
+            <DiscordLink onClick={close} className="mt-3 h-12 w-full text-xs sm:hidden" />
             <div className="mt-3 grid gap-2 border-t border-[rgb(130_175_255/0.2)] pt-3 sm:hidden">
               <a href="/painel" onClick={close} className="btn-frame h-12 text-xs">
                 <UserRound className="size-4" aria-hidden />
