@@ -138,6 +138,7 @@ Perfil público. `name` vem codificado na URL (`encodeURIComponent`).
 | `excellent` | opcional: opções excelentes já em texto em português |
 | `ancient` | opcional: nome do set ancient, ou `null` |
 | `group`, `index` | opcional: grupo e índice do item no `Item.txt` (ex.: grupo 5, índice 10). Com eles o site mostra a imagem `/images/items/<grupo>-<indice>.webp`, se existir; sem imagem, mostra o nome |
+| `durability` | opcional: durabilidade atual do item (o site mostra "Durabilidade: N" na descrição) |
 
 Mande só os espaços ocupados; os que faltarem o site mostra como "Vazio".
 

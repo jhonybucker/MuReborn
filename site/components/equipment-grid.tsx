@@ -2,6 +2,7 @@
 
 import Image from 'next/image'
 import { useState } from 'react'
+import { type TooltipTone, buildTooltip } from '@/lib/item-tooltip'
 
 // Itens equipados no formato de GET /api/characters/:name → equipment (docs/api-site.md).
 // A API decodifica Character.Inventory com o Item.txt do servidor e manda os nomes prontos.
@@ -32,9 +33,11 @@ export type EquipmentItem = {
   excellent?: string[]
   /** Nome do set ancient, quando for. */
   ancient?: string | null
-  /** Grupo e índice do item no Item.txt; com eles o site mostra /images/items/<grupo>-<indice>.webp. */
+  /** Grupo e índice do item no Item.txt (imagem /images/items/<grupo>-<indice>.webp). */
   group?: number
   index?: number
+  /** Durabilidade atual, quando a API mandar. */
+  durability?: number
 }
 
 const LABELS: Record<EquipmentSlot, string> = {
@@ -81,6 +84,22 @@ function nameColor(item: EquipmentItem) {
   return 'text-white'
 }
 
+/** "Divine Staff of Archangel" → "divine-staff-of-archangel" (nome do arquivo do ícone). */
+const slug = (name: string) =>
+  name
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '')
+
+/** Imagens a tentar, em ordem: pelo nome do item e depois por grupo-índice. */
+function imageCandidates(item: EquipmentItem) {
+  const keys = [slug(item.name)]
+  if (item.group !== undefined && item.index !== undefined) keys.push(`${item.group}-${item.index}`)
+  return keys
+}
+
 const fullName = (item: EquipmentItem) =>
   `${item.ancient ? `${item.ancient} ` : ''}${item.name}${item.level > 0 ? ` +${item.level}` : ''}`
 
@@ -120,8 +139,8 @@ export function EquipmentGrid({ items }: { items: EquipmentItem[] | undefined })
             {(Object.keys(BOXES) as EquipmentSlot[]).map((slot) => {
               const [x, y, w, h] = BOXES[slot]
               const item = itemAt(slot)
-              const imageKey = item?.group !== undefined && item.index !== undefined ? `${item.group}-${item.index}` : null
-              const showImage = imageKey !== null && !brokenImages.has(imageKey)
+              const imageKey = item ? (imageCandidates(item).find((key) => !brokenImages.has(key)) ?? null) : null
+              const showImage = imageKey !== null
               const small = SMALL.includes(slot)
               return (
                 <button
@@ -148,7 +167,7 @@ export function EquipmentGrid({ items }: { items: EquipmentItem[] | undefined })
                           src={`/images/items/${imageKey}.webp`}
                           alt=""
                           className="relative h-[85%] w-[85%] object-contain drop-shadow-[0_2px_4px_#000]"
-                          onError={() => setBrokenImages((set) => new Set(set).add(imageKey))}
+                          onError={() => setBrokenImages((set) => new Set(set).add(imageKey!))}
                         />
                       ) : (
                         <span
@@ -218,6 +237,15 @@ function FloatingTooltip({
 }
 
 /** Caixa de informação no estilo do jogo: fundo preto translúcido, texto centralizado, opções em azul. */
+// Cores das linhas como na caixa de item do jogo: atributos em branco, opções em azul.
+const TONES: Record<TooltipTone, string> = {
+  white: 'text-white/90',
+  gray: 'text-white/55',
+  blue: 'text-[#7fa6ff]',
+  gold: 'text-[#f7c955]',
+  red: 'text-[#ff6b6b]',
+}
+
 function ItemInfo({ slot, item }: { slot: EquipmentSlot; item: EquipmentItem | undefined }) {
   return (
     <div className="rounded-[4px] border border-white/20 bg-black/85 px-4 py-3 text-center text-[13px] leading-snug shadow-[0_10px_30px_-8px_#000] backdrop-blur-[2px]">
@@ -231,21 +259,17 @@ function ItemInfo({ slot, item }: { slot: EquipmentSlot; item: EquipmentItem | u
           {item.ancient ? <p className="text-[#6fd3ff]">Set {item.ancient}</p> : null}
           <p className={`font-bold ${nameColor(item)}`}>{fullName(item)}</p>
           <p className="mt-0.5 text-[11px] text-white/45 uppercase">{LABELS[slot]}</p>
-          {item.skill || item.luck || item.option || item.excellent?.length ? (
-            <ul className="mt-2.5 flex flex-col gap-0.5 text-[#7fa6ff]">
-              {item.skill ? <li>Skill do item</li> : null}
-              {item.luck ? (
-                <>
-                  <li>Luck (sucesso da Jewel of Soul +25%)</li>
-                  <li>Luck (dano crítico +5%)</li>
-                </>
-              ) : null}
-              {item.option ? <li>Opção adicional +{item.option}</li> : null}
-              {item.excellent?.map((option) => (
-                <li key={option}>{option}</li>
-              ))}
-            </ul>
-          ) : null}
+          <ul className="mt-2.5 flex flex-col gap-0.5">
+            {buildTooltip(item).map((line, i) =>
+              line ? (
+                <li key={i} className={TONES[line.tone]}>
+                  {line.text}
+                </li>
+              ) : (
+                <li key={i} className="h-2" aria-hidden />
+              ),
+            )}
+          </ul>
         </>
       )}
     </div>
