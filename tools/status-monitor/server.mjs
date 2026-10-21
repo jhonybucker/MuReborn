@@ -4,7 +4,6 @@
 
 import dns from 'node:dns/promises'
 import http from 'node:http'
-import net from 'node:net'
 
 const HOST = 'mu-reborn.duckdns.org'
 const EXPECTED_IP = '102.165.46.30'
@@ -20,10 +19,12 @@ const CHECKS = [
   { id: 'net-google', group: 'Sua internet', label: 'Google', kind: 'http', url: 'https://www.google.com/generate_204' },
   { id: 'net-cloudflare', group: 'Sua internet', label: 'Cloudflare', kind: 'http', url: 'https://1.1.1.1/cdn-cgi/trace' },
   { id: 'dns', group: 'Servidor', label: `DNS ${HOST}`, kind: 'dns' },
-  { id: 'tcp-44405', group: 'Jogo', label: 'ConnectServer (44405)', kind: 'tcp', port: 44405 },
-  { id: 'tcp-55901', group: 'Jogo', label: 'GameServer (55901)', kind: 'tcp', port: 55901 },
-  { id: 'tcp-55960', group: 'Jogo', label: 'Porta 55960', kind: 'tcp', port: 55960 },
-  { id: 'tcp-55970', group: 'Jogo', label: 'Porta 55970', kind: 'tcp', port: 55970 },
+  // Portas do jogo: lidas do /status (a VPS checa de dentro). NÃO conectar nelas daqui: o ConnectServer
+  // tem proteção contra flood e bloqueia o IP que abre conexões repetidas — inclusive o seu jogo.
+  { id: 'game-44405', group: 'Jogo', label: 'ConnectServer (44405)', kind: 'game', port: 44405 },
+  { id: 'game-55901', group: 'Jogo', label: 'GameServer (55901)', kind: 'game', port: 55901 },
+  { id: 'game-55960', group: 'Jogo', label: 'Porta 55960', kind: 'game', port: 55960 },
+  { id: 'game-55970', group: 'Jogo', label: 'Porta 55970', kind: 'game', port: 55970 },
   { id: 'api-status', group: 'API do site', label: '/status', kind: 'api', path: '/status' },
   { id: 'api-rankings', group: 'API do site', label: '/rankings', kind: 'api', path: '/rankings' },
   { id: 'api-events', group: 'API do site', label: '/events', kind: 'api', path: '/events' },
@@ -32,20 +33,6 @@ const CHECKS = [
 
 const history = Object.fromEntries(CHECKS.map((c) => [c.id, []]))
 let lastApiStatus = null
-
-function tcpCheck(port) {
-  return new Promise((resolve) => {
-    const start = performance.now()
-    const socket = net.connect({ host: EXPECTED_IP, port })
-    const done = (ok, detail) => {
-      socket.destroy()
-      resolve({ ok, ms: ok ? Math.round(performance.now() - start) : null, detail })
-    }
-    socket.setTimeout(TIMEOUT_MS, () => done(false, 'sem resposta (timeout)'))
-    socket.once('connect', () => done(true))
-    socket.once('error', (error) => done(false, error.code ?? error.message))
-  })
-}
 
 async function httpCheck(url, expectOk) {
   const start = performance.now()
@@ -76,14 +63,25 @@ async function dnsCheck() {
 
 async function runChecks() {
   const at = Date.now()
+  // As portas do jogo dependem do /status, então ele roda primeiro.
+  const statusCheck = CHECKS.find((c) => c.id === 'api-status')
+  const status = await httpCheck(API + statusCheck.path, true)
+  const ports = status.ok ? status.body?.ports ?? {} : null
+  if (status.ok) lastApiStatus = status.body
   await Promise.all(
     CHECKS.map(async (check) => {
       let result
-      if (check.kind === 'tcp') result = await tcpCheck(check.port)
+      if (check.id === 'api-status') result = status
+      else if (check.kind === 'game')
+        result = ports === null
+          ? { ok: false, ms: null, detail: 'sem resposta da API (/status)' }
+          : ports[String(check.port)]
+            ? { ok: true, ms: status.ms, detail: 'no ar (visto pela VPS)' }
+            : { ok: false, ms: null, detail: 'porta fechada na VPS' }
       else if (check.kind === 'dns') result = await dnsCheck()
       else if (check.kind === 'http') result = await httpCheck(check.url, false)
       else result = await httpCheck(API + check.path, true)
-      if (check.id === 'api-status' && result.ok) lastApiStatus = result.body
+      result = { ...result }
       delete result.body
       const list = history[check.id]
       list.push({ at, ...result })

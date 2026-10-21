@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>MU Reborn</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="bg" aria-hidden="true"></div>
+
+  <!-- Barra de título própria: a área toda arrasta a janela; só os ícones no canto direito. -->
+  <header class="titlebar" data-tauri-drag-region>
+    <button type="button" id="btn-settings-top" aria-label="Configurações">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/></svg>
+    </button>
+    <button type="button" id="btn-minimize" aria-label="Minimizar">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 13h14"/></svg>
+    </button>
+    <button type="button" id="btn-close" aria-label="Fechar">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+    </button>
+  </header>
+
+  <main class="hero">
+    <img class="logo" src="assets/logo.webp" alt="MU Reborn" draggable="false">
+    <p class="rates">99B <span>|</span> 1000x EXP <span>|</span> RESET ACUMULATIVO</p>
+    <div class="divider" aria-hidden="true"><i></i><b></b><i></i></div>
+    <p class="tagline">Reviva a lenda,<br>agora em um novo mundo!</p>
+    <div class="divider" aria-hidden="true"><i></i><b></b><i></i></div>
+
+    <div class="play-wrap">
+      <span class="arrow left" aria-hidden="true"></span>
+      <button type="button" class="btn-play" id="btn-play"><span>Jogar</span></button>
+      <span class="arrow right" aria-hidden="true"></span>
+    </div>
+    <div class="secondary">
+      <button type="button" class="btn-frame" id="btn-register"><span>Registrar</span></button>
+      <button type="button" class="btn-frame" id="btn-settings"><span>Configurações</span></button>
+    </div>
+  </main>
+
+  <section class="news panel" aria-labelledby="news-title">
+    <h2 id="news-title">Notícias</h2>
+    <ul id="news-list"><li class="muted">Carregando…</li></ul>
+  </section>
+
+  <footer class="update panel">
+    <div class="update-top">
+      <p id="update-text">Aguardando atualização…</p>
+      <p class="server" id="server-state"><i class="dot"></i>Verificando servidor…</p>
+    </div>
+    <div class="update-row">
+      <div class="bar" role="progressbar" aria-labelledby="update-text" aria-valuemin="0" aria-valuemax="100" id="update-bar"><i id="update-fill"></i></div>
+      <span id="update-pct">0%</span>
+    </div>
+  </footer>
+
+  <dialog id="settings">
+    <form method="dialog" id="settings-form">
+      <h2>Configurações</h2>
+      <label>Resolução
+        <select name="resolution">
+          <option value="0">640 × 480</option>
+          <option value="1">800 × 600</option>
+          <option value="2">1024 × 768</option>
+          <option value="3">1280 × 1024</option>
+        </select>
+      </label>
+      <label class="check"><input type="checkbox" name="windowMode"> Jogar em janela</label>
+      <label class="check"><input type="checkbox" name="music"> Música</label>
+      <label class="check"><input type="checkbox" name="sound"> Efeitos sonoros</label>
+      <label>Volume <output id="volume-out">5</output>
+        <input type="range" name="volume" min="0" max="9" step="1">
+      </label>
+      <p class="hint">As opções valem na próxima vez que o jogo abrir.</p>
+      <div class="dialog-buttons">
+        <button type="button" class="btn-frame small" id="settings-cancel"><span>Cancelar</span></button>
+        <button type="submit" class="btn-frame small primary" id="settings-save"><span>Salvar</span></button>
+      </div>
+    </form>
+  </dialog>
+
+  <div class="toast" id="toast" role="alert" hidden></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

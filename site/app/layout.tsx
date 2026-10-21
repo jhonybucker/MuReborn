@@ -9,14 +9,20 @@ import './globals.css'
 const cinzel = Cinzel({ subsets: ['latin'], variable: '--font-cinzel', weight: ['500', '700', '900'] })
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 
+// Endereço público do site, preenchido no build pela hospedagem: Vercel (domínio de produção)
+// ou Netlify (URL). Fora delas, o servidor local.
+function siteUrl() {
+  if (process.env.VERCEL_PROJECT_PRODUCTION_URL) return `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
+  return process.env.URL ?? 'http://localhost:3000'
+}
+
 const title = 'MU Reborn 99b — Servidor Hard com Reset Acumulativo'
 const description =
   'MU Reborn: servidor privado de MU Online versão 99b, estilo hard, com reset acumulativo e master reset. Baixe o cliente, configure e entre na batalha.'
 
 export const metadata: Metadata = {
   // A prévia de links (WhatsApp, Discord) precisa do endereço completo da imagem.
-  // No Netlify, URL é preenchida no build com o domínio principal do site.
-  metadataBase: new URL(process.env.URL ?? 'http://localhost:3000'),
+  metadataBase: new URL(siteUrl()),
   title,
   description,
   openGraph: {
