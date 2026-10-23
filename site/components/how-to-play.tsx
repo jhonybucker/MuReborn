@@ -5,8 +5,8 @@ const steps = [
   {
     icon: Download,
     title: 'Baixe o cliente',
-    text: `Faça o download do cliente ${SERVER.version} oficial do MU Reborn e extraia em uma pasta.`,
-    cta: { label: 'Download (MEGA)', href: SERVER.clientUrl, external: true, primary: true },
+    text: `Baixe o instalador oficial do MU Reborn ${SERVER.version} e instale. Ele cria o atalho MU Reborn na área de trabalho.`,
+    cta: { label: 'Baixar instalador', href: SERVER.clientUrl, external: true, primary: true },
   },
   {
     icon: UserPlus,
@@ -65,8 +65,8 @@ export function HowToPlay() {
                 <p className="relative mb-7 leading-relaxed text-[#a9bde0]">
                   {text ?? (
                     <>
-                      Abra o <code className="font-mono text-foreground">main.exe</code>, escolha o servidor MU Reborn e
-                      entre com o login e a senha que você criou.
+                      Abra pelo atalho MU Reborn, clique em JOGAR, escolha o servidor MU Reborn e entre com o login e a
+                      senha que você criou.
                     </>
                   )}
                 </p>

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
-import { Cpu, Download, HardDrive, MemoryStick, Monitor, MonitorCog, Wifi } from 'lucide-react'
+import { Cpu, Download, HardDrive, MemoryStick, Monitor, MonitorCog, ShieldCheck, Wifi } from 'lucide-react'
+import { CopyButton } from '@/components/copy-button'
 import { DiscordLink } from '@/components/discord-link'
 import { SiteFooter } from '@/components/rules-footer'
 import { SectionHeading } from '@/components/section-heading'
@@ -8,8 +9,10 @@ import { SERVER } from '@/lib/server-info'
 
 export const metadata: Metadata = {
   title: 'Downloads e requisitos — MU Reborn',
-  description: `Baixe o cliente oficial do MU Reborn ${SERVER.version}, veja os requisitos e como resolver os erros mais comuns.`,
+  description: `Baixe o instalador oficial do MU Reborn ${SERVER.version}, confira o SHA-256, veja os requisitos e como resolver os erros mais comuns.`,
 }
+
+const hashCommand = `Get-FileHash .\\${SERVER.clientFile}`
 
 // Requisitos típicos do cliente 99b; aproximados, não medidos neste cliente.
 const requirements = [
@@ -22,19 +25,29 @@ const requirements = [
 ]
 
 const steps = [
-  { title: 'Baixe o cliente', text: `Use o botão acima. O arquivo tem cerca de ${SERVER.clientSizeMb} MB e fica no MEGA.` },
   {
-    title: 'Extraia em uma pasta simples',
-    text: 'Extraia com o WinRAR, o 7-Zip ou o extrator do Windows em uma pasta como C:\\MuReborn. Evite "Arquivos de Programas": o Windows bloqueia gravações ali e o jogo pode não salvar configurações.',
+    title: 'Baixe o instalador',
+    text: `Use o botão acima. O arquivo ${SERVER.clientFile} tem cerca de ${SERVER.clientSizeMb} MB. Se quiser, confira o SHA-256 antes de abrir.`,
+  },
+  {
+    title: 'Instale o jogo',
+    text: 'Se o Windows mostrar "O Windows protegeu o computador", clique em Mais informações › Executar assim mesmo. Instale fora de "Arquivos de Programas": a pasta padrão do instalador já serve.',
   },
   { title: 'Crie sua conta', text: 'Cadastre login e senha na página inicial, na seção Criar conta.' },
-  { title: 'Abra o jogo', text: 'Execute o main.exe, escolha o servidor MU Reborn e entre com o login criado.' },
+  {
+    title: 'Abra o jogo',
+    text: 'Use o atalho MU Reborn da área de trabalho. O launcher confere os arquivos, você clica em JOGAR, escolhe o servidor MU Reborn e entra com o login criado.',
+  },
 ]
 
 const problems = [
   {
+    q: 'O Windows mostrou "O Windows protegeu o computador"',
+    a: 'O instalador ainda não tem assinatura digital paga, e por isso o SmartScreen avisa. Confira o SHA-256 do arquivo (veja acima) e, se for igual, clique em Mais informações › Executar assim mesmo.',
+  },
+  {
     q: 'O antivírus apagou ou bloqueou o main.exe',
-    a: 'Clientes antigos de MU costumam ser marcados por engano pelos antivírus. Baixe só pelo link oficial desta página e adicione a pasta do jogo às exclusões: Segurança do Windows › Proteção contra vírus e ameaças › Gerenciar configurações › Exclusões › Adicionar uma exclusão › Pasta. Depois extraia o cliente de novo.',
+    a: 'Clientes antigos de MU costumam ser marcados por engano pelos antivírus. Baixe só pelo link oficial desta página e adicione a pasta do jogo às exclusões: Segurança do Windows › Proteção contra vírus e ameaças › Gerenciar configurações › Exclusões › Adicionar uma exclusão › Pasta. Depois abra o jogo pelo atalho MU Reborn: o launcher baixa de novo os arquivos que faltarem.',
   },
   {
     q: 'Erro dizendo que falta um arquivo d3dx9_XX.dll',
@@ -51,7 +64,7 @@ const problems = [
   },
   {
     q: 'O jogo não abre ou fecha sozinho no Windows 10 ou 11',
-    a: 'Clique com o botão direito no main.exe › Propriedades › Compatibilidade. Marque "Executar este programa em modo de compatibilidade para" Windows XP (Service Pack 3) e "Executar este programa como administrador". Clique em OK e tente de novo.',
+    a: 'Clique com o botão direito no main.exe (na pasta Cliente, dentro da pasta onde o jogo foi instalado) › Propriedades › Compatibilidade. Marque "Executar este programa em modo de compatibilidade para" Windows XP (Service Pack 3) e "Executar este programa como administrador". Clique em OK e tente de novo.',
   },
   {
     q: 'Não conecta ao servidor',
@@ -77,14 +90,39 @@ export default function DownloadsPage() {
           <div className="glass flex flex-col gap-4 rounded-[36px] p-6 sm:min-w-[360px] md:p-8">
             <div>
               <p className="font-serif text-xl font-bold">Cliente MU Reborn {SERVER.version}</p>
-              <p className="text-sm text-muted-foreground">Cerca de {SERVER.clientSizeMb} MB · hospedado no MEGA</p>
+              <p className="text-sm text-muted-foreground">
+                Instalador para Windows · cerca de {SERVER.clientSizeMb} MB · launcher e jogo em português
+              </p>
             </div>
             <a href={SERVER.clientUrl} target="_blank" rel="noopener noreferrer" className="btn-play h-14 text-lg">
               <Download className="size-5" aria-hidden />
-              Baixar cliente
+              Baixar instalador
             </a>
+            <div className="flex flex-col gap-1">
+              <div className="flex items-center justify-between gap-2">
+                <p className="text-[10px] tracking-[0.2em] text-muted-foreground uppercase">SHA-256</p>
+                <CopyButton value={SERVER.clientSha256} label="Copiar" className="-mr-3" />
+              </div>
+              <code className="font-mono text-xs break-all text-[#bfe0ff]">{SERVER.clientSha256}</code>
+            </div>
           </div>
         </div>
+
+        <section aria-labelledby="conferir" className="glass flex flex-col gap-4 rounded-[36px] p-6 md:p-8">
+          <h2 id="conferir" className="flex items-center gap-3 font-serif text-2xl font-bold">
+            <ShieldCheck className="size-6 text-accent" aria-hidden />
+            Confira se o download é o oficial
+          </h2>
+          <p className="leading-relaxed text-[#a9bde0]">
+            Abra o PowerShell na pasta onde o instalador foi salvo e rode o comando abaixo. O valor em <code className="font-mono text-foreground">Hash</code>{' '}
+            precisa ser igual ao SHA-256 acima (maiúsculas e minúsculas não importam). Se for diferente, não abra o arquivo:
+            apague e baixe de novo por esta página.
+          </p>
+          <div className="flex flex-wrap items-center gap-2">
+            <code className="rounded-sm bg-[#071230] px-3 py-2 font-mono text-sm break-all text-foreground">{hashCommand}</code>
+            <CopyButton value={hashCommand} label="Copiar comando" />
+          </div>
+        </section>
 
         <section aria-labelledby="requisitos" className="flex flex-col gap-6">
           <h2 id="requisitos" className="text-chrome font-serif text-3xl font-black md:text-4xl">
